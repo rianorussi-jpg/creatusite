@@ -62,6 +62,12 @@ export default function Crear() {
       return;
     }
 
+    if (!authData.session) {
+      setError('Revisa tu correo para confirmar tu cuenta antes de continuar.');
+      setCargando(false);
+      return;
+    }
+
     // 3. Crear el negocio
     const { error: bizError } = await supabase.from('businesses').insert({
       owner_id: authData.user.id,
