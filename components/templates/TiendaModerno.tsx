@@ -7,8 +7,8 @@ const c = {
   accent: '#2f6b46', accentS: '#3c8058', text: '#1c1f1c', muted: '#707870', pill: '#eef1ec'
 };
 
-function agruparPorCategoria(products) {
-  const grupos = {};
+function agruparPorCategoria(products: any[]) {
+  const grupos: Record<string, any[]> = {};
   for (const p of products) {
     const cat = p.categoria || 'General';
     if (!grupos[cat]) grupos[cat] = [];
@@ -17,7 +17,7 @@ function agruparPorCategoria(products) {
   return grupos;
 }
 
-function Pasos({ paso }) {
+function Pasos({ paso }: { paso: number }) {
   const steps = ['Menú', 'Entrega', 'Confirmar'];
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '8px 0 28px' }}>
@@ -39,10 +39,10 @@ function Pasos({ paso }) {
   );
 }
 
-export default function TiendaModerno({ business, products }) {
+export default function TiendaModerno({ business, products }: { business: any; products: any[] }) {
   const { config, nombre } = business;
   const [paso, setPaso] = useState(1);
-  const [carrito, setCarrito] = useState({});
+  const [carrito, setCarrito] = useState<Record<string, number>>({});
   const [tipoEntrega, setTipoEntrega] = useState('domicilio');
   const [direccion, setDireccion] = useState('');
   const [datos, setDatos] = useState({ nombre: '', telefono: '' });
@@ -52,7 +52,7 @@ export default function TiendaModerno({ business, products }) {
   const total = entries.reduce((s, e) => s + (e.producto ? e.producto.precio * e.qty : 0), 0);
   const count = entries.reduce((s, e) => s + e.qty, 0);
 
-  const cambiarQty = (id, delta) => {
+  const cambiarQty = (id: string, delta: number) => {
     setCarrito((prev) => {
       const nueva = (prev[id] || 0) + delta;
       const copia = { ...prev };
@@ -158,6 +158,6 @@ export default function TiendaModerno({ business, products }) {
 }
 
 const btnQty = { width: 26, height: 26, borderRadius: 8, border: 'none', background: c.pill, cursor: 'pointer', fontWeight: 700 };
-const inputStyle = { width: '100%', boxSizing: 'border-box', border: `1.5px solid ${c.border}`, borderRadius: 14, padding: '13px 16px', fontSize: 15 };
+const inputStyle = { width: '100%', boxSizing: 'border-box' as const, border: `1.5px solid ${c.border}`, borderRadius: 14, padding: '13px 16px', fontSize: 15 };
 const btnPrimary = { width: '100%', border: 'none', borderRadius: 14, background: c.accent, color: '#fff', fontWeight: 700, fontSize: 15, padding: '14px 0', cursor: 'pointer' };
 const btnGhost = { display: 'block', margin: '10px auto 0', background: 'none', border: 'none', color: c.muted, cursor: 'pointer' };
