@@ -154,7 +154,7 @@ export default function TiendaDirecto({ business, products }: { business: any; p
         <div style={{ background: k.red, color: '#fff', padding: '14px 5vw', display: 'flex', alignItems: 'center', gap: 12 }}>
           {config?.logoUrl && <img src={config.logoUrl} alt={nombre} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', border: '2px solid #fff' }} />}
           <div>
-            <div style={{ fontWeight: 800, fontSize: 20 }}>{config?.titulo || nombre}</div>
+            {!config?.logoUrl && <div style={{ fontWeight: 800, fontSize: 20 }}>{config?.titulo || nombre}</div>}
             {config?.descripcion && <div style={{ fontSize: 11, color: k.yellow, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{config.descripcion}</div>}
           </div>
         </div>
