@@ -44,7 +44,7 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
           </Link>
         ))}
         <div style={{ marginTop: 'auto', paddingTop: 24, borderTop: '1px solid #333A5C' }}>
-          
+          <a
             href="https://creatusitio.mx"
             style={{ fontSize: 12, color: '#8489A8', textDecoration: 'none' }}
           >
