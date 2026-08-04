@@ -156,11 +156,10 @@ export default function TiendaModerno({ business, products }: { business: any; p
   };
 
   return (
-    <div style={{ background: c.bg, minHeight: '100vh', color: c.text, fontFamily: 'system-ui,sans-serif' }}>
-      <div style={{ background: c.accent, color: '#fff', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ background: c.accent, color: '#fff', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         {config?.logoUrl && <img src={config.logoUrl} alt={nombre} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />}
         <div>
-          <div style={{ fontWeight: 800, fontSize: 18 }}>{config?.titulo || nombre}</div>
+          {!config?.logoUrl && <div style={{ fontWeight: 800, fontSize: 18 }}>{config?.titulo || nombre}</div>}
           {config?.descripcion && <div style={{ fontSize: 12, opacity: 0.9, marginTop: 2 }}>{config.descripcion}</div>}
         </div>
       </div>
