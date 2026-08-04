@@ -22,6 +22,44 @@ const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descrip
   ]
 };
 
+const TIPO_LABEL: Record<Tipo, { titulo: string; sub: string }> = {
+  tienda: { titulo: 'Tienda', sub: 'Vende productos con carrito y pedido por WhatsApp' },
+  landing: { titulo: 'Landing page', sub: 'Presenta tu negocio en una sola página' },
+  menu: { titulo: 'Menú', sub: 'Categorías, fotos y pedidos de comida' }
+};
+
+function PasoIndicador({ paso }: { paso: number }) {
+  const nombres = ['Tipo', 'Plantilla', 'Datos'];
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 36 }}>
+      {nombres.map((n, i) => {
+        const num = i + 1;
+        const activo = paso === num;
+        const hecho = paso > num;
+        return (
+          <div key={n} style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <div
+                style={{
+                  width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600,
+                  background: activo || hecho ? 'var(--color-accent)' : 'transparent',
+                  color: activo || hecho ? '#fff' : 'var(--color-ink-soft)',
+                  border: activo || hecho ? 'none' : '1.5px solid var(--color-border)'
+                }}
+              >
+                {hecho ? '✓' : num}
+              </div>
+              <span style={{ fontSize: 11, color: activo ? 'var(--color-ink)' : 'var(--color-ink-soft)', fontWeight: activo ? 600 : 400 }}>{n}</span>
+            </div>
+            {i < nombres.length - 1 && <div style={{ width: 56, height: 1.5, background: hecho ? 'var(--color-accent)' : 'var(--color-border)', margin: '0 6px 18px' }} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Crear() {
   const router = useRouter();
   const supabase = supabaseBrowser();
@@ -54,7 +92,6 @@ export default function Crear() {
     }
     setCargando(true);
 
-    // 1. Verificar disponibilidad del subdominio
     const { data: existente } = await supabase
       .from('businesses')
       .select('id')
@@ -67,7 +104,6 @@ export default function Crear() {
       return;
     }
 
-    // 2. Crear cuenta del dueño
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password
@@ -84,7 +120,6 @@ export default function Crear() {
       return;
     }
 
-    // 3. Crear el negocio
     const { error: bizError } = await supabase.from('businesses').insert({
       owner_id: authData.user.id,
       nombre,
@@ -104,128 +139,138 @@ export default function Crear() {
   }
 
   return (
-    <main style={{ maxWidth: 480, margin: '0 auto', padding: '3rem 1.5rem' }}>
-      {paso === 1 && (
-        <div>
-          <p style={{ color: '#888', fontSize: 14 }}>Paso 1 de 3 — ¿qué quieres crear?</p>
-          {(['tienda', 'landing', 'menu'] as Tipo[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => {
-                setTipo(t);
-                setPaso(2);
-              }}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: 16,
-                marginBottom: 8,
-                borderRadius: 8,
-                border: '1px solid #ddd',
-                background: '#fff',
-                cursor: 'pointer'
-              }}
-            >
-              {t === 'tienda' ? 'Tienda — vende productos' : t === 'landing' ? 'Landing page — presenta tu negocio' : 'Menú — pedidos de comida'}
-            </button>
-          ))}
+    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2.5rem 1.25rem' }}>
+      <div className="card" style={{ width: '100%', maxWidth: 460, padding: '2.5rem 2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 17 }}>
+            creatusitio<span style={{ color: 'var(--color-accent)' }}>.mx</span>
+          </span>
         </div>
-      )}
 
-      {paso === 2 && tipo && (
-        <div>
-          <p style={{ color: '#888', fontSize: 14 }}>Paso 2 de 3 — elige una plantilla</p>
-          {TEMPLATES_POR_TIPO[tipo].map((t) => (
-            <button
-              key={t.id}
-              onClick={() => {
-                setTemplate(t.id);
-                setPaso(3);
-              }}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: 16,
-                marginBottom: 8,
-                borderRadius: 8,
-                border: '1px solid #ddd',
-                background: '#fff',
-                cursor: 'pointer'
-              }}
-            >
-              <span style={{ fontWeight: 500 }}>{t.nombre}</span>
-              <br />
-              <span style={{ fontSize: 13, color: '#888' }}>{t.descripcion}</span>
-            </button>
-          ))}
-          <button onClick={() => setPaso(1)} style={{ marginTop: 8, background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>
-            ← Atrás
-          </button>
-        </div>
-      )}
+        <PasoIndicador paso={paso} />
 
-      {paso === 3 && (
-        <div>
-          <p style={{ color: '#888', fontSize: 14 }}>Paso 3 de 3 — datos de tu negocio</p>
-          <input placeholder="Nombre del negocio" value={nombre} onChange={(e) => setNombre(e.target.value)} style={inputStyle} />
-          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 8, marginBottom: 8 }}>
-            <input
-              placeholder="tunegocio"
-              value={subdominio}
-              onChange={(e) => setSubdominio(normalizarSubdominio(e.target.value))}
-              style={{ ...inputStyle, border: 'none', marginBottom: 0 }}
-            />
-            <span style={{ paddingRight: 12, color: '#888', fontSize: 14 }}>.creatusitio.mx</span>
+        {paso === 1 && (
+          <div>
+            <h2 style={{ fontSize: 20, marginBottom: 4 }}>¿Qué quieres crear?</h2>
+            <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Elige lo que mejor describe tu negocio</p>
+            {(['tienda', 'landing', 'menu'] as Tipo[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => {
+                  setTipo(t);
+                  setPaso(2);
+                }}
+                style={optionBtn}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--color-accent)')}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
+              >
+                <span style={{ fontWeight: 600, fontSize: 15 }}>{TIPO_LABEL[t].titulo}</span>
+                <br />
+                <span style={{ fontSize: 13, color: 'var(--color-ink-soft)' }}>{TIPO_LABEL[t].sub}</span>
+              </button>
+            ))}
           </div>
-          <input
-            placeholder="WhatsApp donde recibirás pedidos (ej. 524421234567)"
-            value={whatsapp}
-            onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))}
-            style={inputStyle}
-          />
-          <input placeholder="Tu correo" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-          <input
-            placeholder="Contraseña"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle}
-          />
-          {error && <p style={{ color: '#c0392b', fontSize: 14 }}>{error}</p>}
-          <button
-            onClick={crearNegocio}
-            disabled={cargando}
-            style={{
-              width: '100%',
-              padding: 14,
-              background: '#111',
-              color: '#fff',
-              borderRadius: 8,
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 500
-            }}
-          >
-            {cargando ? 'Creando...' : 'Crear mi página'}
-          </button>
-          <button onClick={() => setPaso(2)} style={{ marginTop: 8, background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>
-            ← Atrás
-          </button>
-        </div>
-      )}
+        )}
+
+        {paso === 2 && tipo && (
+          <div>
+            <h2 style={{ fontSize: 20, marginBottom: 4 }}>Elige tu plantilla</h2>
+            <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Podrás personalizarla después desde tu panel</p>
+            {TEMPLATES_POR_TIPO[tipo].map((t) => (
+              <button
+                key={t.id}
+                onClick={() => {
+                  setTemplate(t.id);
+                  setPaso(3);
+                }}
+                style={optionBtn}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--color-accent)')}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
+              >
+                <span style={{ fontWeight: 600, fontSize: 15 }}>{t.nombre}</span>
+                <br />
+                <span style={{ fontSize: 13, color: 'var(--color-ink-soft)' }}>{t.descripcion}</span>
+              </button>
+            ))}
+            <button onClick={() => setPaso(1)} style={backBtn}>← Atrás</button>
+          </div>
+        )}
+
+        {paso === 3 && (
+          <div>
+            <h2 style={{ fontSize: 20, marginBottom: 4 }}>Datos de tu negocio</h2>
+            <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Último paso antes de publicar</p>
+
+            <input placeholder="Nombre del negocio" value={nombre} onChange={(e) => setNombre(e.target.value)} style={inputStyle} />
+
+            <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid var(--color-border)', borderRadius: 10, marginBottom: 10, overflow: 'hidden' }}>
+              <input
+                placeholder="tunegocio"
+                value={subdominio}
+                onChange={(e) => setSubdominio(normalizarSubdominio(e.target.value))}
+                style={{ ...inputStyle, border: 'none', marginBottom: 0, borderRadius: 0 }}
+              />
+              <span style={{ paddingRight: 14, color: 'var(--color-ink-soft)', fontSize: 13, fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>.creatusitio.mx</span>
+            </div>
+
+            <input
+              placeholder="WhatsApp donde recibirás pedidos (ej. 524421234567)"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))}
+              style={inputStyle}
+            />
+            <input placeholder="Tu correo" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+            <input
+              placeholder="Contraseña"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ ...inputStyle, marginBottom: 16 }}
+            />
+
+            {error && <p style={{ color: 'var(--color-accent)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
+
+            <button onClick={crearNegocio} disabled={cargando} className="btn btn-accent btn-full">
+              {cargando ? 'Creando...' : 'Crear mi página →'}
+            </button>
+            <button onClick={() => setPaso(2)} style={backBtn}>← Atrás</button>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
 
+const optionBtn: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  textAlign: 'left',
+  padding: '16px 18px',
+  marginBottom: 10,
+  borderRadius: 12,
+  border: '1.5px solid var(--color-border)',
+  background: '#fff',
+  cursor: 'pointer',
+  transition: 'border-color 0.15s ease'
+};
+
+const backBtn: React.CSSProperties = {
+  display: 'block',
+  margin: '14px auto 0',
+  background: 'none',
+  border: 'none',
+  color: 'var(--color-ink-soft)',
+  cursor: 'pointer',
+  fontSize: 13
+};
+
 const inputStyle: React.CSSProperties = {
   display: 'block',
   width: '100%',
-  padding: 12,
-  marginBottom: 8,
-  borderRadius: 8,
-  border: '1px solid #ddd',
+  padding: 13,
+  marginBottom: 10,
+  borderRadius: 10,
+  border: '1.5px solid var(--color-border)',
   fontSize: 14,
   boxSizing: 'border-box'
 };
