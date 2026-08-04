@@ -7,8 +7,8 @@ const k = {
   ink: '#1B1410', gray: '#7A6B60', line: '#EBDFCF', wa: '#25D366'
 };
 
-function agruparPorCategoria(products) {
-  const grupos = {};
+function agruparPorCategoria(products: any[]) {
+  const grupos: Record<string, any[]> = {};
   for (const p of products) {
     const cat = p.categoria || 'General';
     if (!grupos[cat]) grupos[cat] = [];
@@ -17,24 +17,25 @@ function agruparPorCategoria(products) {
   return grupos;
 }
 
-export default function TiendaDirecto({ business, products }) {
+export default function TiendaDirecto({ business, products }: { business: any; products: any[] }) {
   const { config, nombre } = business;
   const grupos = agruparPorCategoria(products);
   const categorias = Object.keys(grupos);
 
-  const [carrito, setCarrito] = useState({});
+  const [carrito, setCarrito] = useState<Record<string, number>>({});
   const [activeCat, setActiveCat] = useState(categorias[0]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [step, setStep] = useState('cart');
-  const [deliveryType, setDeliveryType] = useState(null);
+  const [deliveryType, setDeliveryType] = useState<string | null>(null);
   const [direccion, setDireccion] = useState('');
-  const refs = useRef({});
+  const refs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          if (e.isIntersecting) setActiveCat(e.target.dataset.cat);
+          const cat = (e.target as HTMLElement).dataset.cat;
+          if (e.isIntersecting && cat) setActiveCat(cat);
         });
       },
       { rootMargin: '-120px 0px -70% 0px' }
@@ -43,7 +44,7 @@ export default function TiendaDirecto({ business, products }) {
     return () => obs.disconnect();
   }, [products]);
 
-  const cambiarQty = (id, delta) => {
+  const cambiarQty = (id: string, delta: number) => {
     setCarrito((prev) => {
       const nueva = (prev[id] || 0) + delta;
       const copia = { ...prev };
@@ -92,7 +93,7 @@ export default function TiendaDirecto({ business, products }) {
 
       <main style={{ maxWidth: 720, margin: '0 auto', padding: '22px 5vw 10px' }}>
         {categorias.map((cat) => (
-          <div key={cat} ref={(el) => (refs.current[cat] = el)} data-cat={cat}>
+          <div key={cat} ref={(el) => { refs.current[cat] = el; }} data-cat={cat}>
             <div style={{ fontWeight: 800, fontSize: 15, color: k.redDark, margin: '26px 0 12px', textTransform: 'uppercase' }}>{cat}</div>
             {grupos[cat].map((p) => (
               <div key={p.id} style={{ borderBottom: `1px solid ${k.line}`, padding: '16px 0', display: 'flex', gap: 12 }}>
