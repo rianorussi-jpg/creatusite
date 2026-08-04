@@ -2,7 +2,7 @@
 
 import { useMiNegocio } from '@/lib/useMiNegocio';
 
-const OPCIONES_POR_TIPO = {
+const OPCIONES_POR_TIPO: Record<string, { id: string; nombre: string; descripcion: string }[]> = {
   tienda: [
     { id: 'tienda-moderno', nombre: 'Paso a paso', descripcion: 'Flujo por pasos: menú → entrega → confirmar' },
     { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con carrito flotante' }
