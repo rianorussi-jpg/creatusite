@@ -7,7 +7,6 @@ type Valor = { nombre: string; precioExtra: number };
 type Opcion = { nombre: string; tipo: 'unica' | 'multiple'; valores: Valor[] };
 
 function parseValores(texto: string): Valor[] {
-  // Formato: "BBQ, Picante:0, Extra queso:15" -> nombre con precio extra opcional
   return texto
     .split(',')
     .map((v) => v.trim())
@@ -37,6 +36,7 @@ export default function ProductosPanel() {
   const [subiendoImagen, setSubiendoImagen] = useState(false);
   const [opciones, setOpciones] = useState<Opcion[]>([]);
   const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!negocio) return;
@@ -88,39 +88,52 @@ export default function ProductosPanel() {
   async function agregarProducto() {
     if (!negocio || !nombre || !precio) return;
     setGuardando(true);
+    setError('');
 
-    let imagen_url: string | null = null;
-    if (imagenFile) {
-      setSubiendoImagen(true);
-      const ext = imagenFile.name.split('.').pop();
-      const path = `${negocio.id}/products/${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('creatusitio-assets').upload(path, imagenFile);
-      if (!uploadError) {
+    try {
+      let imagen_url: string | null = null;
+      if (imagenFile) {
+        setSubiendoImagen(true);
+        const ext = imagenFile.name.split('.').pop();
+        const path = `${negocio.id}/products/${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from('creatusitio-assets').upload(path, imagenFile);
+        setSubiendoImagen(false);
+        if (uploadError) {
+          setError(`No se pudo subir la imagen: ${uploadError.message}. ¿Ya creaste el bucket "creatusitio-assets" en Supabase Storage?`);
+          setGuardando(false);
+          return;
+        }
         const { data } = supabase.storage.from('creatusitio-assets').getPublicUrl(path);
         imagen_url = data.publicUrl;
       }
-      setSubiendoImagen(false);
-    }
 
-    const { data, error } = await supabase
-      .from('products')
-      .insert({
-        business_id: negocio.id,
-        nombre,
-        precio: Number(precio),
-        descripcion,
-        categoria: categoria || 'General',
-        imagen_url,
-        opciones: opciones.filter((o) => o.nombre && o.valores.length > 0)
-      })
-      .select()
-      .single();
+      const { data, error: insertError } = await supabase
+        .from('products')
+        .insert({
+          business_id: negocio.id,
+          nombre,
+          precio: Number(precio),
+          descripcion,
+          categoria: categoria || 'General',
+          imagen_url,
+          opciones: opciones.filter((o) => o.nombre && o.valores.length > 0)
+        })
+        .select()
+        .single();
 
-    if (!error && data) {
+      if (insertError) {
+        setError(`No se pudo guardar el producto: ${insertError.message}. ¿Ya corriste el SQL que agrega las columnas "categories" y "opciones"?`);
+        return;
+      }
+
       setProductos([...productos, data]);
       resetForm();
+    } catch (err: any) {
+      setError(err?.message || 'Ocurrió un error inesperado.');
+    } finally {
+      setGuardando(false);
+      setSubiendoImagen(false);
     }
-    setGuardando(false);
   }
 
   async function eliminarProducto(id: string) {
@@ -198,6 +211,7 @@ export default function ProductosPanel() {
         ))}
         <button onClick={agregarOpcion} style={{ ...btnSecundario, marginBottom: 12 }}>+ Agregar personalización</button>
 
+        {error && <p style={{ color: '#c0392b', fontSize: 13, marginBottom: 10 }}>{error}</p>}
         <button onClick={agregarProducto} disabled={guardando || subiendoImagen} style={btnPrimario}>
           {subiendoImagen ? 'Subiendo imagen...' : guardando ? 'Guardando...' : 'Agregar producto'}
         </button>
