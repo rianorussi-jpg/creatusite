@@ -10,6 +10,7 @@ create table if not exists businesses (
   subdominio text unique not null,
   template_id text not null default 'minimalista' check (template_id in ('minimalista', 'sencillo', 'tienda-moderno', 'tienda-directo')),
   estado text not null default 'activo' check (estado in ('activo', 'pausado')),
+  categories text[] not null default '{}',
   config jsonb not null default '{
     "colorPrimario": "#111111",
     "logoUrl": null,
@@ -29,6 +30,7 @@ create table if not exists products (
   precio numeric(10,2) not null default 0,
   imagen_url text,
   categoria text default 'General',
+  opciones jsonb not null default '[]'::jsonb,
   disponible boolean not null default true,
   orden int not null default 0,
   created_at timestamptz not null default now()
@@ -70,3 +72,31 @@ create index if not exists idx_products_business on products (business_id);
 -- alter table businesses drop constraint businesses_template_id_check;
 -- alter table businesses add constraint businesses_template_id_check
 --   check (template_id in ('minimalista', 'sencillo', 'tienda-moderno', 'tienda-directo'));
+
+-- Si ya tenías las tablas creadas y solo quieres agregar categorías y
+-- personalizaciones de producto (imágenes, opciones), corre nada más esto:
+-- alter table businesses add column if not exists categories text[] not null default '{}';
+-- alter table products add column if not exists opciones jsonb not null default '[]'::jsonb;
+
+-- ── STORAGE (imágenes de productos y logo) ──────────────────────────────────
+-- Esto no se puede hacer por SQL: en el dashboard de Supabase ve a
+-- Storage → New bucket → nómbralo "creatusitio-assets" → márcalo como Public.
+-- Luego, en el SQL Editor, corre esto para permitir subir/leer archivos:
+
+insert into storage.buckets (id, name, public)
+values ('creatusitio-assets', 'creatusitio-assets', true)
+on conflict (id) do nothing;
+
+create policy "Lectura pública de archivos"
+  on storage.objects for select
+  using (bucket_id = 'creatusitio-assets');
+
+create policy "Usuarios autenticados suben archivos"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'creatusitio-assets');
+
+create policy "Usuarios autenticados actualizan sus archivos"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'creatusitio-assets');

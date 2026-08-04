@@ -31,6 +31,7 @@ export default function Crear() {
   const [template, setTemplate] = useState<TemplateId | null>(null);
   const [nombre, setNombre] = useState('');
   const [subdominio, setSubdominio] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -47,7 +48,7 @@ export default function Crear() {
 
   async function crearNegocio() {
     setError('');
-    if (!tipo || !template || !nombre || !subdominio || !email || !password) {
+    if (!tipo || !template || !nombre || !subdominio || !whatsapp || !email || !password) {
       setError('Falta completar algún campo.');
       return;
     }
@@ -90,7 +91,7 @@ export default function Crear() {
       tipo,
       subdominio,
       template_id: template,
-      config: { titulo: nombre, colorPrimario: '#111111', descripcion: '', whatsapp: '', instagram: '' }
+      config: { titulo: nombre, colorPrimario: '#111111', descripcion: '', whatsapp, instagram: '' }
     });
 
     if (bizError) {
@@ -178,6 +179,12 @@ export default function Crear() {
             />
             <span style={{ paddingRight: 12, color: '#888', fontSize: 14 }}>.creatusitio.mx</span>
           </div>
+          <input
+            placeholder="WhatsApp donde recibirás pedidos (ej. 524421234567)"
+            value={whatsapp}
+            onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))}
+            style={inputStyle}
+          />
           <input placeholder="Tu correo" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
           <input
             placeholder="Contraseña"

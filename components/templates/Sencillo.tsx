@@ -7,7 +7,11 @@ export default function Sencillo({ business, products }: Props) {
   return (
     <main style={{ fontFamily: 'system-ui, sans-serif' }}>
       <header style={{ background: color, color: '#fff', padding: '3rem 1.5rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: 30, fontWeight: 700, margin: 0 }}>{config?.titulo || nombre}</h1>
+        {config?.logoUrl ? (
+          <img src={config.logoUrl} alt={nombre} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 12, margin: '0 auto 12px', border: '2px solid #fff' }} />
+        ) : (
+          <h1 style={{ fontSize: 30, fontWeight: 700, margin: 0 }}>{config?.titulo || nombre}</h1>
+        )}
         {config?.descripcion && <p style={{ marginTop: 8, opacity: 0.9 }}>{config.descripcion}</p>}
         {config?.whatsapp && (
           <a

@@ -40,8 +40,40 @@ Fase 1: modelo de datos + templates. Fase 2: registro + subdominios dinámicos (
 - Verifica que `tunegocio.creatusitio.mx` cargue el template correcto
 - Entra a `creatusitio.mx/panel`, agrega un producto y confirma que aparezca en la página pública
 
+## Actualización: WhatsApp en el registro, imágenes, categorías y personalizaciones
+
+Si ya tenías el proyecto corriendo, necesitas correr en el SQL Editor de Supabase (una sola vez):
+
+```sql
+alter table businesses add column if not exists categories text[] not null default '{}';
+alter table products add column if not exists opciones jsonb not null default '[]'::jsonb;
+
+insert into storage.buckets (id, name, public)
+values ('creatusitio-assets', 'creatusitio-assets', true)
+on conflict (id) do nothing;
+
+create policy "Lectura pública de archivos"
+  on storage.objects for select
+  using (bucket_id = 'creatusitio-assets');
+
+create policy "Usuarios autenticados suben archivos"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'creatusitio-assets');
+
+create policy "Usuarios autenticados actualizan sus archivos"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'creatusitio-assets');
+```
+
+Esto habilita:
+- El campo de WhatsApp en `/crear` (paso 3) — se guarda directo en `config.whatsapp`
+- Subida de imagen por producto y de logo del negocio (bucket `creatusitio-assets` en Supabase Storage)
+- Categorías propias por negocio (`businesses.categories`), con opción de crear una nueva desde el panel de productos
+- Personalizaciones por producto (`products.opciones`): opciones de "elige 1" o "elige varias" con costo extra opcional, que aparecen como un panel al momento de pedir en las plantillas de tienda
+
 ## Lo que falta para producción completa (siguientes iteraciones)
-- Subida de imágenes de producto vía Supabase Storage (por ahora `imagen_url` se llena a mano)
 - Confirmación por correo al registrarse (Supabase Auth ya lo soporta, falta configurar el template de correo)
-- Botón de "publicar pedido por WhatsApp" en las páginas públicas de tienda/menú
+- Reordenar productos y categorías (arrastrar y soltar)
 - Panel de pedidos en tiempo real, reutilizando el patrón ya construido en panel.creatusitio.mx
