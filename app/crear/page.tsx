@@ -5,7 +5,22 @@ import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabaseClient';
 
 type Tipo = 'tienda' | 'landing' | 'menu';
-type TemplateId = 'minimalista' | 'sencillo';
+type TemplateId = 'minimalista' | 'sencillo' | 'tienda-moderno' | 'tienda-directo';
+
+const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descripcion: string }[]> = {
+  tienda: [
+    { id: 'tienda-moderno', nombre: 'Paso a paso', descripcion: 'Flujo por pasos: menú → entrega → confirmar. Verde, limpio.' },
+    { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con categorías y carrito flotante. Rojo/amarillo, directo.' }
+  ],
+  menu: [
+    { id: 'tienda-moderno', nombre: 'Paso a paso', descripcion: 'Flujo por pasos: menú → entrega → confirmar. Verde, limpio.' },
+    { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con categorías y carrito flotante. Rojo/amarillo, directo.' }
+  ],
+  landing: [
+    { id: 'minimalista', nombre: 'Minimalista', descripcion: 'Limpio, mucho blanco, tipografía grande' },
+    { id: 'sencillo', nombre: 'Sencillo', descripcion: 'Directo y llamativo' }
+  ]
+};
 
 export default function Crear() {
   const router = useRouter();
@@ -117,14 +132,14 @@ export default function Crear() {
         </div>
       )}
 
-      {paso === 2 && (
+      {paso === 2 && tipo && (
         <div>
           <p style={{ color: '#888', fontSize: 14 }}>Paso 2 de 3 — elige una plantilla</p>
-          {(['minimalista', 'sencillo'] as TemplateId[]).map((t) => (
+          {TEMPLATES_POR_TIPO[tipo].map((t) => (
             <button
-              key={t}
+              key={t.id}
               onClick={() => {
-                setTemplate(t);
+                setTemplate(t.id);
                 setPaso(3);
               }}
               style={{
@@ -139,7 +154,9 @@ export default function Crear() {
                 cursor: 'pointer'
               }}
             >
-              {t === 'minimalista' ? 'Minimalista — limpio, mucho blanco' : 'Sencillo — directo y llamativo'}
+              <span style={{ fontWeight: 500 }}>{t.nombre}</span>
+              <br />
+              <span style={{ fontSize: 13, color: '#888' }}>{t.descripcion}</span>
             </button>
           ))}
           <button onClick={() => setPaso(1)} style={{ marginTop: 8, background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>

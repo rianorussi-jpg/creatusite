@@ -8,7 +8,7 @@ create table if not exists businesses (
   nombre text not null,
   tipo text not null check (tipo in ('tienda', 'landing', 'menu')),
   subdominio text unique not null,
-  template_id text not null default 'minimalista' check (template_id in ('minimalista', 'sencillo')),
+  template_id text not null default 'minimalista' check (template_id in ('minimalista', 'sencillo', 'tienda-moderno', 'tienda-directo')),
   estado text not null default 'activo' check (estado in ('activo', 'pausado')),
   config jsonb not null default '{
     "colorPrimario": "#111111",
@@ -64,3 +64,9 @@ create policy "Lectura pública de productos disponibles"
 
 create index if not exists idx_businesses_subdominio on businesses (subdominio);
 create index if not exists idx_products_business on products (business_id);
+
+-- Si ya habías corrido este schema antes (proyecto existente) y solo quieres
+-- agregar los nuevos templates de tienda, corre nada más esto:
+-- alter table businesses drop constraint businesses_template_id_check;
+-- alter table businesses add constraint businesses_template_id_check
+--   check (template_id in ('minimalista', 'sencillo', 'tienda-moderno', 'tienda-directo'));

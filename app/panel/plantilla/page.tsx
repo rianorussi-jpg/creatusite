@@ -2,13 +2,24 @@
 
 import { useMiNegocio } from '@/lib/useMiNegocio';
 
-const OPCIONES = [
-  { id: 'minimalista', nombre: 'Minimalista', descripcion: 'Limpio, mucho blanco, tipografía grande' },
-  { id: 'sencillo', nombre: 'Sencillo', descripcion: 'Directo y llamativo, estilo La Bonelissa' }
-];
+const OPCIONES_POR_TIPO = {
+  tienda: [
+    { id: 'tienda-moderno', nombre: 'Paso a paso', descripcion: 'Flujo por pasos: menú → entrega → confirmar' },
+    { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con carrito flotante' }
+  ],
+  menu: [
+    { id: 'tienda-moderno', nombre: 'Paso a paso', descripcion: 'Flujo por pasos: menú → entrega → confirmar' },
+    { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con carrito flotante' }
+  ],
+  landing: [
+    { id: 'minimalista', nombre: 'Minimalista', descripcion: 'Limpio, mucho blanco, tipografía grande' },
+    { id: 'sencillo', nombre: 'Sencillo', descripcion: 'Directo y llamativo' }
+  ]
+};
 
 export default function PlantillaPanel() {
   const { negocio, setNegocio, cargando, supabase } = useMiNegocio();
+  const OPCIONES = negocio ? OPCIONES_POR_TIPO[negocio.tipo] || [] : [];
 
   async function elegir(id: string) {
     if (!negocio) return;
