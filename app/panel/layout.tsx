@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 const ITEMS = [
   { href: '/panel', label: 'Resumen' },
@@ -7,7 +8,7 @@ const ITEMS = [
   { href: '/panel/plantilla', label: 'Plantilla' }
 ];
 
-export default function PanelLayout({ children }: { children: React.ReactNode }) {
+export default function PanelLayout({ children }: { children: ReactNode }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <nav
