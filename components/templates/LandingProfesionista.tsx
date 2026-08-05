@@ -44,6 +44,7 @@ export default function LandingProfesionista({ business }: { business: any; prod
   const whatsapp: string | undefined = config.whatsapp;
   const telefono: string | undefined = config.telefono;
   const horarioTexto: string = config.horarioTexto || 'Lunes a Viernes | 9:00 - 18:00';
+  const logoUrl: string | undefined = config.logoUrl;
 
   const especialidades: Especialidad[] = config.especialidades?.length ? config.especialidades : ESPECIALIDADES_DEFAULT;
   const beneficios: string[] = config.beneficios?.length ? config.beneficios : BENEFICIOS_DEFAULT;
@@ -74,7 +75,11 @@ export default function LandingProfesionista({ business }: { business: any; prod
       {/* HEADER */}
       <header style={{ background: 'white', boxShadow: '0 3px 10px rgba(0,0,0,.06)' }}>
         <div style={{ width: '90%', maxWidth: 1150, margin: 'auto', height: 80, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 26, fontWeight: 'bold', color: primary }}>{nombre}</div>
+          {logoUrl ? (
+            <img src={logoUrl} alt={nombre} style={{ height: 44, objectFit: 'contain' }} />
+          ) : (
+            <div style={{ fontSize: 26, fontWeight: 'bold', color: primary }}>{nombre}</div>
+          )}
           <nav style={{ display: 'flex', gap: 25 }}>
             <a href="#especialidades" style={{ textDecoration: 'none', color: '#333' }}>Especialidades</a>
             <a href="#nosotros" style={{ textDecoration: 'none', color: '#333' }}>Nosotros</a>
