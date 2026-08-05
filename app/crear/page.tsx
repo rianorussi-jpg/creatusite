@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabaseClient';
 
 type Tipo = 'tienda' | 'landing' | 'menu';
-type TemplateId = 'minimalista' | 'sencillo' | 'tienda-moderno' | 'tienda-directo';
+type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'tienda-moderno' | 'tienda-directo';
 
 const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descripcion: string }[]> = {
   tienda: [
@@ -17,8 +17,8 @@ const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descrip
     { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con categorías y carrito flotante. Rojo/amarillo, directo.' }
   ],
   landing: [
-    { id: 'minimalista', nombre: 'Minimalista', descripcion: 'Limpio, mucho blanco, tipografía grande' },
-    { id: 'sencillo', nombre: 'Sencillo', descripcion: 'Directo y llamativo' }
+    { id: 'landing-negocio', nombre: 'Negocio', descripcion: 'Hero, beneficios, planes de precio y testimonios. Azul/índigo, ideal para negocios y servicios en general.' },
+    { id: 'landing-profesionista', nombre: 'Profesionista', descripcion: 'Barra de contacto, especialidades, horarios y formulario de citas. Verde azulado, ideal para doctores, abogados y consultorios.' }
   ]
 };
 
@@ -84,6 +84,60 @@ export default function Crear() {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
 
+  function configInicial(tpl: TemplateId): Record<string, any> {
+    const base = { titulo: nombre, colorPrimario: '#111111', descripcion: '', whatsapp, instagram: '' };
+
+    if (tpl === 'landing-negocio') {
+      return {
+        ...base,
+        beneficios: [
+          { titulo: 'Rápido', texto: 'Respuesta ágil y atención inmediata.' },
+          { titulo: 'Cómodo', texto: 'Pide o consulta desde cualquier dispositivo.' },
+          { titulo: 'Confiable', texto: 'Un servicio en el que puedes confiar.' }
+        ],
+        planes: [
+          { nombre: 'Básico', precio: '$—', features: 'Servicio 1\nServicio 2\nServicio 3' },
+          { nombre: 'Popular', precio: '$—', features: 'Todo lo anterior\nServicio 4\nServicio 5', destacado: true },
+          { nombre: 'Premium', precio: '$—', features: 'Todo incluido\nAtención prioritaria' }
+        ],
+        testimonios: [
+          { texto: 'Excelente servicio, muy recomendado.', autor: 'Cliente satisfecho' },
+          { texto: 'Atención de calidad y buen trato.', autor: 'Cliente satisfecho' }
+        ]
+      };
+    }
+
+    if (tpl === 'landing-profesionista') {
+      return {
+        ...base,
+        telefono: '',
+        horarioTexto: 'Lunes a Viernes | 9:00 - 18:00',
+        beneficios: [
+          { titulo: 'Atención personalizada', texto: '' },
+          { titulo: 'Tecnología moderna', texto: '' },
+          { titulo: 'Años de experiencia', texto: '' },
+          { titulo: 'Consultorio certificado', texto: '' }
+        ],
+        especialidades: [
+          { titulo: 'Consulta General', texto: 'Evaluación y diagnóstico profesional.' },
+          { titulo: 'Tratamientos', texto: 'Opciones adaptadas a cada paciente.' },
+          { titulo: 'Seguimiento', texto: 'Control y acompañamiento continuo.' }
+        ],
+        horarios: [
+          { dia: 'Lunes - Viernes', horario: '9:00 - 18:00' },
+          { dia: 'Sábado', horario: '9:00 - 14:00' },
+          { dia: 'Domingo', horario: 'Cerrado' }
+        ],
+        testimonios: [
+          { texto: 'Excelente atención y explicación durante toda la consulta.', autor: 'Paciente' },
+          { texto: 'El trato fue muy profesional y resolvió todas mis dudas.', autor: 'Paciente' }
+        ]
+      };
+    }
+
+    return base;
+  }
+
   async function crearNegocio() {
     setError('');
     if (!tipo || !template || !nombre || !subdominio || !whatsapp || !email || !password) {
@@ -126,7 +180,7 @@ export default function Crear() {
       tipo,
       subdominio,
       template_id: template,
-      config: { titulo: nombre, colorPrimario: '#111111', descripcion: '', whatsapp, instagram: '' }
+      config: configInicial(template)
     });
 
     if (bizError) {
