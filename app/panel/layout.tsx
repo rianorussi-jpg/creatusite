@@ -117,7 +117,7 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
           >
             Cerrar sesión
           </button>
-          
+          <a
             href="https://creatusitio.mx"
             style={{ fontSize: 12, color: '#8489A8', textDecoration: 'none' }}
           >
