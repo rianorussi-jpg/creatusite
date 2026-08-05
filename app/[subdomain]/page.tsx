@@ -1,13 +1,13 @@
 import { notFound } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabaseServer';
-import Minimalista from '@/components/templates/Minimalista';
-import Sencillo from '@/components/templates/Sencillo';
+import LandingNegocio from '@/components/templates/LandingNegocio';
+import LandingProfesionista from '@/components/templates/LandingProfesionista';
 import TiendaModerno from '@/components/templates/TiendaModerno';
 import TiendaDirecto from '@/components/templates/TiendaDirecto';
 
 const TEMPLATES: Record<string, any> = {
-  minimalista: Minimalista,
-  sencillo: Sencillo,
+  'landing-negocio': LandingNegocio,
+  'landing-profesionista': LandingProfesionista,
   'tienda-moderno': TiendaModerno,
   'tienda-directo': TiendaDirecto
 };
@@ -31,7 +31,7 @@ export default async function PaginaNegocio({ params }: { params: { subdomain: s
     .eq('disponible', true)
     .order('orden', { ascending: true });
 
-  const Template = TEMPLATES[business.template_id] || Minimalista;
+  const Template = TEMPLATES[business.template_id] || LandingNegocio;
 
   return <Template business={business} products={products || []} />;
 }
