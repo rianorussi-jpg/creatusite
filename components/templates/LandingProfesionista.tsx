@@ -12,11 +12,13 @@ const ESPECIALIDADES_DEFAULT: Especialidad[] = [
   { titulo: 'Seguimiento', texto: 'Control y acompañamiento continuo.' }
 ];
 
-const BENEFICIOS_DEFAULT: string[] = [
-  'Atención personalizada',
-  'Tecnología moderna',
-  'Años de experiencia',
-  'Consultorio certificado'
+type Beneficio = { titulo: string; texto?: string };
+
+const BENEFICIOS_DEFAULT: Beneficio[] = [
+  { titulo: 'Atención personalizada' },
+  { titulo: 'Tecnología moderna' },
+  { titulo: 'Años de experiencia' },
+  { titulo: 'Consultorio certificado' }
 ];
 
 const TESTIMONIOS_DEFAULT: Testimonio[] = [
@@ -47,7 +49,7 @@ export default function LandingProfesionista({ business }: { business: any; prod
   const logoUrl: string | undefined = config.logoUrl;
 
   const especialidades: Especialidad[] = config.especialidades?.length ? config.especialidades : ESPECIALIDADES_DEFAULT;
-  const beneficios: string[] = config.beneficios?.length ? config.beneficios : BENEFICIOS_DEFAULT;
+  const beneficios: Beneficio[] = config.beneficios?.length ? config.beneficios : BENEFICIOS_DEFAULT;
   const testimonios: Testimonio[] = config.testimonios?.length ? config.testimonios : TESTIMONIOS_DEFAULT;
   const horarios: Horario[] = config.horarios?.length ? config.horarios : HORARIOS_DEFAULT;
 
@@ -142,7 +144,10 @@ export default function LandingProfesionista({ business }: { business: any; prod
           <h2 style={{ textAlign: 'center', marginBottom: 40 }}>¿Por qué elegirnos?</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20 }}>
             {beneficios.map((b, i) => (
-              <div key={i} style={{ background: 'white', padding: 25, borderRadius: 15 }}>✔ {b}</div>
+              <div key={i} style={{ background: 'white', padding: 25, borderRadius: 15 }}>
+                ✔ {b.titulo}
+                {b.texto && <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{b.texto}</div>}
+              </div>
             ))}
           </div>
         </div>
