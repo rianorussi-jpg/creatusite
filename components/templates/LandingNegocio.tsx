@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-type Beneficio = { emoji: string; titulo: string; texto: string };
+type Beneficio = { emoji?: string; titulo: string; texto: string };
 type Plan = { nombre: string; precio: string; features: string; destacado?: boolean };
 type Testimonio = { texto: string; autor: string };
 
