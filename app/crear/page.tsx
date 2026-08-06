@@ -1,8 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { supabaseBrowser } from '@/lib/supabaseClient';
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!;
+
+declare global {
+  interface Window {
+    turnstile: any;
+  }
+}
 
 type Tipo = 'tienda' | 'landing' | 'menu';
 type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'tienda-moderno' | 'tienda-directo';
@@ -74,6 +83,21 @@ export default function Crear() {
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [turnstileListo, setTurnstileListo] = useState(false);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (paso === 3 && turnstileListo && turnstileRef.current && !widgetIdRef.current && window.turnstile) {
+      widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: (token: string) => setTurnstileToken(token),
+        'expired-callback': () => setTurnstileToken(''),
+        'error-callback': () => setTurnstileToken('')
+      });
+    }
+  }, [paso, turnstileListo]);
 
   const normalizarSubdominio = (valor: string) =>
     valor
@@ -144,7 +168,25 @@ export default function Crear() {
       setError('Falta completar algún campo.');
       return;
     }
+    if (!turnstileToken) {
+      setError('Completa la verificación de seguridad.');
+      return;
+    }
     setCargando(true);
+
+    const verify = await fetch('/api/verify-turnstile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: turnstileToken })
+    });
+    const verifyData = await verify.json();
+    if (!verifyData.success) {
+      setError('No se pudo verificar que eres humano. Intenta de nuevo.');
+      window.turnstile?.reset(widgetIdRef.current);
+      setTurnstileToken('');
+      setCargando(false);
+      return;
+    }
 
     const { data: existente } = await supabase
       .from('businesses')
@@ -194,6 +236,11 @@ export default function Crear() {
 
   return (
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2.5rem 1.25rem' }}>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        strategy="afterInteractive"
+        onLoad={() => setTurnstileListo(true)}
+      />
       <div className="card" style={{ width: '100%', maxWidth: 460, padding: '2.5rem 2rem' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 17 }}>
@@ -284,7 +331,9 @@ export default function Crear() {
 
             {error && <p style={{ color: 'var(--color-accent)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
-            <button onClick={crearNegocio} disabled={cargando} className="btn btn-accent btn-full">
+            <div ref={turnstileRef} style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }} />
+
+            <button onClick={crearNegocio} disabled={cargando || !turnstileToken} className="btn btn-accent btn-full">
               {cargando ? 'Creando...' : 'Crear mi página →'}
             </button>
             <button onClick={() => setPaso(2)} style={backBtn}>← Atrás</button>
