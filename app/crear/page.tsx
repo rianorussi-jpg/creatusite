@@ -13,28 +13,23 @@ declare global {
   }
 }
 
-type Tipo = 'tienda' | 'landing' | 'menu';
+type Tipo = 'tienda' | 'landing';
 type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'tienda-moderno' | 'tienda-directo';
 
 const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descripcion: string }[]> = {
   tienda: [
-    { id: 'tienda-moderno', nombre: 'Paso a paso', descripcion: 'Flujo por pasos: menú → entrega → confirmar. Verde, limpio.' },
-    { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con categorías y carrito flotante. Rojo/amarillo, directo.' }
-  ],
-  menu: [
-    { id: 'tienda-moderno', nombre: 'Paso a paso', descripcion: 'Flujo por pasos: menú → entrega → confirmar. Verde, limpio.' },
-    { id: 'tienda-directo', nombre: 'Menú directo', descripcion: 'Scroll continuo con categorías y carrito flotante. Rojo/amarillo, directo.' }
+    { id: 'tienda-moderno', nombre: 'Minimalista', descripcion: 'Diseño limpio en tonos verdes con un flujo guiado para comprar paso a paso.' },
+    { id: 'tienda-directo', nombre: 'Colores', descripcion: 'Diseño llamativo en rojo y amarillo, con categorías visibles y compra más directa.' }
   ],
   landing: [
-    { id: 'landing-negocio', nombre: 'Negocio', descripcion: 'Hero, beneficios, planes de precio y testimonios. Azul/índigo, ideal para negocios y servicios en general.' },
-    { id: 'landing-profesionista', nombre: 'Profesionista', descripcion: 'Barra de contacto, especialidades, horarios y formulario de citas. Verde azulado, ideal para doctores, abogados y consultorios.' }
+    { id: 'landing-negocio', nombre: 'Negocio', descripcion: 'Hero, beneficios, planes de precio y testimonios. Ideal para negocios y servicios en general.' },
+    { id: 'landing-profesionista', nombre: 'Profesionista', descripcion: 'Contacto, especialidades, horarios y formulario de citas. Ideal para profesionistas y consultorios.' }
   ]
 };
 
 const TIPO_LABEL: Record<Tipo, { titulo: string; sub: string }> = {
   tienda: { titulo: 'Tienda', sub: 'Vende productos con carrito y pedido por WhatsApp' },
-  landing: { titulo: 'Landing page', sub: 'Presenta tu negocio en una sola página' },
-  menu: { titulo: 'Menú', sub: 'Categorías, fotos y pedidos de comida' }
+  landing: { titulo: 'Landing page', sub: 'Presenta tu negocio, servicios y contacto en una sola página' }
 };
 
 function PasoIndicador({ paso }: { paso: number }) {
@@ -65,6 +60,99 @@ function PasoIndicador({ paso }: { paso: number }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+
+function VistaPreviaPlantilla({ id }: { id: TemplateId }) {
+  const shell: React.CSSProperties = {
+    height: 210,
+    borderRadius: 14,
+    overflow: 'hidden',
+    border: '1px solid rgba(15, 23, 42, 0.08)',
+    boxShadow: '0 10px 26px rgba(15, 23, 42, 0.08)',
+    position: 'relative'
+  };
+
+  const line = (width: string, background = 'rgba(15, 23, 42, 0.12)'): React.CSSProperties => ({
+    width,
+    height: 6,
+    borderRadius: 999,
+    background
+  });
+
+  if (id === 'tienda-moderno') {
+    return (
+      <div style={{ ...shell, background: '#f3f4f1', padding: 12 }}>
+        <div style={{ background: '#2f6b46', borderRadius: 10, padding: '11px 12px', color: '#fff', fontSize: 11, fontWeight: 800 }}>Tu tienda</div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, margin: '12px 0 10px' }}>
+          {[1, 2, 3].map((n) => <div key={n} style={{ width: 22, height: 22, borderRadius: '50%', background: n === 1 ? '#2f6b46' : '#eef1ec', color: n === 1 ? '#fff' : '#707870', display: 'grid', placeItems: 'center', fontSize: 9, fontWeight: 800 }}>{n}</div>)}
+        </div>
+        <div style={{ textAlign: 'center', fontWeight: 800, fontSize: 12, color: '#1c1f1c', marginBottom: 9 }}>¿Qué se te antoja hoy?</div>
+        {[['Hamburguesa clásica', '$99'], ['Papas especiales', '$65']].map(([name, price]) => (
+          <div key={name} style={{ background: '#fff', border: '1px solid #d9ddd6', borderRadius: 11, padding: 9, display: 'flex', gap: 8, alignItems: 'center', marginBottom: 7 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: '#eef1ec' }} />
+            <div style={{ flex: 1 }}><div style={{ fontSize: 9, fontWeight: 800 }}>{name}</div><div style={{ ...line('58%'), marginTop: 5 }} /></div>
+            <div style={{ color: '#2f6b46', fontWeight: 900, fontSize: 10 }}>{price}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === 'tienda-directo') {
+    return (
+      <div style={{ ...shell, background: '#FFF7EA' }}>
+        <div style={{ background: '#C81620', padding: '12px 14px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 900, fontSize: 12 }}>TU TIENDA</span>
+          <span style={{ background: '#FFC933', color: '#1B1410', borderRadius: 999, padding: '4px 8px', fontSize: 8, fontWeight: 900 }}>CARRITO</span>
+        </div>
+        <div style={{ display: 'flex', gap: 6, padding: '10px 12px 8px', overflow: 'hidden' }}>
+          {['Favoritos', 'Combos', 'Bebidas'].map((x, i) => <span key={x} style={{ background: i === 0 ? '#FFC933' : '#fff', border: '1px solid #EBDFCF', borderRadius: 999, padding: '5px 9px', fontSize: 8, fontWeight: 800, whiteSpace: 'nowrap' }}>{x}</span>)}
+        </div>
+        <div style={{ padding: '0 12px' }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: '#1B1410', margin: '5px 0 8px' }}>Favoritos</div>
+          {[['Combo especial', '$129'], ['Tacos', '$89']].map(([name, price]) => (
+            <div key={name} style={{ background: '#fff', border: '1px solid #EBDFCF', borderRadius: 9, padding: 8, display: 'flex', gap: 8, alignItems: 'center', marginBottom: 7 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 7, background: '#FFC933' }} />
+              <div style={{ flex: 1 }}><div style={{ fontSize: 9, fontWeight: 900 }}>{name}</div><div style={{ ...line('62%', '#EBDFCF'), marginTop: 5 }} /></div>
+              <span style={{ color: '#C81620', fontSize: 10, fontWeight: 900 }}>{price}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (id === 'landing-profesionista') {
+    return (
+      <div style={{ ...shell, background: '#fafafa' }}>
+        <div style={{ background: '#0d5c63', height: 20 }} />
+        <div style={{ background: '#fff', height: 34, padding: '0 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#263238' }}>CONSULTORIO</span>
+          <div style={{ display: 'flex', gap: 8 }}>{[1,2,3].map(n => <span key={n} style={{ ...line('24px'), height: 4 }} />)}</div>
+        </div>
+        <div style={{ padding: 14, display: 'grid', gridTemplateColumns: '1.15fr .85fr', gap: 10, alignItems: 'center' }}>
+          <div><div style={{ fontSize: 18, fontWeight: 900, color: '#0d5c63', lineHeight: 1.05 }}>Atención profesional para ti</div><div style={{ ...line('88%'), marginTop: 9 }} /><div style={{ ...line('68%'), marginTop: 5 }} /><div style={{ width: 72, height: 22, borderRadius: 999, background: '#0d5c63', marginTop: 11 }} /></div>
+          <div style={{ height: 76, borderRadius: 12, background: '#0d5c6314', border: '1px solid #0d5c6320' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 7, padding: '0 14px' }}>{['Consulta', 'Tratamientos', 'Seguimiento'].map(x => <div key={x} style={{ background: '#fff', borderRadius: 9, padding: 8, boxShadow: '0 5px 15px rgba(0,0,0,.05)', fontSize: 8, fontWeight: 800, color: '#263238' }}>{x}</div>)}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ ...shell, background: '#f5f7fb' }}>
+      <div style={{ background: '#fff', height: 35, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 12px' }}>
+        <span style={{ fontSize: 9, fontWeight: 900 }}>MI NEGOCIO</span>
+        <div style={{ display: 'flex', gap: 7 }}>{[1,2,3,4].map(n => <span key={n} style={{ ...line('21px'), height: 4 }} />)}</div>
+      </div>
+      <div style={{ background: 'linear-gradient(135deg, #2563eb, #2563ebcc)', padding: 14, display: 'grid', gridTemplateColumns: '1fr .85fr', gap: 10, alignItems: 'center', color: '#fff' }}>
+        <div><div style={{ fontWeight: 900, fontSize: 18, lineHeight: 1.05 }}>Haz crecer tu negocio</div><div style={{ ...line('88%', 'rgba(255,255,255,.55)'), marginTop: 8 }} /><div style={{ ...line('70%', 'rgba(255,255,255,.45)'), marginTop: 5 }} /><div style={{ width: 72, height: 21, borderRadius: 999, background: '#fff', marginTop: 10 }} /></div>
+        <div style={{ height: 72, borderRadius: 10, background: 'rgba(255,255,255,.25)', border: '1px solid rgba(255,255,255,.35)' }} />
+      </div>
+      <div style={{ padding: 12 }}><div style={{ fontSize: 11, fontWeight: 900, textAlign: 'center', marginBottom: 8 }}>¿Por qué elegirnos?</div><div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 7 }}>{['Rápido', 'Cómodo', 'Confiable'].map(x => <div key={x} style={{ background: '#fff', borderRadius: 8, padding: 8, boxShadow: '0 4px 14px rgba(0,0,0,.05)', fontSize: 8, fontWeight: 800, color: '#2563eb' }}>{x}</div>)}</div></div>
     </div>
   );
 }
@@ -241,7 +329,7 @@ export default function Crear() {
         strategy="afterInteractive"
         onLoad={() => setTurnstileListo(true)}
       />
-      <div className="card" style={{ width: '100%', maxWidth: 460, padding: '2.5rem 2rem' }}>
+      <div className="card" style={{ width: '100%', maxWidth: paso === 2 ? 760 : 460, padding: '2.5rem 2rem', transition: 'max-width .2s ease' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 17 }}>
             creatusitio<span style={{ color: 'var(--color-accent)' }}>.mx</span>
@@ -254,7 +342,7 @@ export default function Crear() {
           <div>
             <h2 style={{ fontSize: 20, marginBottom: 4 }}>¿Qué quieres crear?</h2>
             <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Elige lo que mejor describe tu negocio</p>
-            {(['tienda', 'landing', 'menu'] as Tipo[]).map((t) => (
+            {(['tienda', 'landing'] as Tipo[]).map((t) => (
               <button
                 key={t}
                 onClick={() => {
@@ -277,22 +365,35 @@ export default function Crear() {
           <div>
             <h2 style={{ fontSize: 20, marginBottom: 4 }}>Elige tu plantilla</h2>
             <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Podrás personalizarla después desde tu panel</p>
-            {TEMPLATES_POR_TIPO[tipo].map((t) => (
-              <button
-                key={t.id}
-                onClick={() => {
-                  setTemplate(t.id);
-                  setPaso(3);
-                }}
-                style={optionBtn}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--color-accent)')}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
-              >
-                <span style={{ fontWeight: 600, fontSize: 15 }}>{t.nombre}</span>
-                <br />
-                <span style={{ fontSize: 13, color: 'var(--color-ink-soft)' }}>{t.descripcion}</span>
-              </button>
-            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 14 }}>
+              {TEMPLATES_POR_TIPO[tipo].map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setTemplate(t.id);
+                    setPaso(3);
+                  }}
+                  style={templateBtn}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-accent)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <VistaPreviaPlantilla id={t.id} />
+                  <div style={{ paddingTop: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 5 }}>
+                      <span style={{ fontWeight: 700, fontSize: 16 }}>{t.nombre}</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-accent)' }}>Elegir →</span>
+                    </div>
+                    <span style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--color-ink-soft)' }}>{t.descripcion}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
             <button onClick={() => setPaso(1)} style={backBtn}>← Atrás</button>
           </div>
         )}
@@ -376,4 +477,18 @@ const inputStyle: React.CSSProperties = {
   border: '1.5px solid var(--color-border)',
   fontSize: 14,
   boxSizing: 'border-box'
+};
+
+
+const templateBtn: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  textAlign: 'left',
+  padding: 12,
+  borderRadius: 16,
+  border: '1.5px solid var(--color-border)',
+  background: '#fff',
+  cursor: 'pointer',
+  transition: 'border-color .15s ease, transform .15s ease, box-shadow .15s ease',
+  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)'
 };
