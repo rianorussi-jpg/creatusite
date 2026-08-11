@@ -169,12 +169,25 @@ export default function Crear() {
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [usuarioSesion, setUsuarioSesion] = useState<any>(null);
+  const [revisandoSesion, setRevisandoSesion] = useState(true);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
   const [turnstileListo, setTurnstileListo] = useState(false);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+
+
+  useEffect(() => {
+    let activo = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!activo) return;
+      setUsuarioSesion(data.user || null);
+      setRevisandoSesion(false);
+    });
+    return () => { activo = false; };
+  }, []);
 
   useEffect(() => {
     if (paso === 3 && turnstileListo && turnstileRef.current && !widgetIdRef.current && window.turnstile) {
@@ -202,6 +215,12 @@ export default function Crear() {
     if (tpl === 'landing-negocio') {
       return {
         ...base,
+        menuItems: [
+          { label: 'Beneficios', href: '#beneficios', visible: true },
+          { label: 'Nosotros', href: '#nosotros', visible: true },
+          { label: 'Planes', href: '#planes', visible: true },
+          { label: 'Contacto', href: '#contacto', visible: true }
+        ],
         beneficios: [
           { titulo: 'Rápido', texto: 'Respuesta ágil y atención inmediata.' },
           { titulo: 'Cómodo', texto: 'Pide o consulta desde cualquier dispositivo.' },
@@ -224,6 +243,12 @@ export default function Crear() {
         ...base,
         telefono: '',
         horarioTexto: 'Lunes a Viernes | 9:00 - 18:00',
+        menuItems: [
+          { label: 'Especialidades', href: '#especialidades', visible: true },
+          { label: 'Nosotros', href: '#nosotros', visible: true },
+          { label: 'Horarios', href: '#horarios', visible: true },
+          { label: 'Contacto', href: '#contacto', visible: true }
+        ],
         beneficios: [
           { titulo: 'Atención personalizada', texto: '' },
           { titulo: 'Tecnología moderna', texto: '' },
@@ -252,8 +277,12 @@ export default function Crear() {
 
   async function crearNegocio() {
     setError('');
-    if (!tipo || !template || !nombre || !subdominio || !whatsapp || !email || !password) {
+    if (!tipo || !template || !nombre || !subdominio || !whatsapp) {
       setError('Falta completar algún campo.');
+      return;
+    }
+    if (!usuarioSesion && (!email || !password)) {
+      setError('Ingresa tu correo y contraseña para crear tu cuenta.');
       return;
     }
     if (!turnstileToken) {
@@ -288,37 +317,40 @@ export default function Crear() {
       return;
     }
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password
-    });
-    if (authError || !authData.user) {
-      setError(authError?.message || 'No se pudo crear la cuenta.');
-      setCargando(false);
-      return;
+    let ownerId = usuarioSesion?.id as string | undefined;
+
+    if (!ownerId) {
+      const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+      if (authError || !authData.user) {
+        setError(authError?.message || 'No se pudo crear la cuenta.');
+        setCargando(false);
+        return;
+      }
+      if (!authData.session) {
+        setError('Revisa tu correo para confirmar tu cuenta antes de continuar.');
+        setCargando(false);
+        return;
+      }
+      ownerId = authData.user.id;
     }
 
-    if (!authData.session) {
-      setError('Revisa tu correo para confirmar tu cuenta antes de continuar.');
-      setCargando(false);
-      return;
-    }
-
-    const { error: bizError } = await supabase.from('businesses').insert({
-      owner_id: authData.user.id,
+    const { data: nuevoNegocio, error: bizError } = await supabase.from('businesses').insert({
+      owner_id: ownerId,
       nombre,
       tipo,
       subdominio,
       template_id: template,
       config: configInicial(template)
-    });
+    }).select('id').single();
 
-    if (bizError) {
-      setError(bizError.message);
+    if (bizError || !nuevoNegocio) {
+      setError(bizError?.message || 'No se pudo crear el negocio.');
       setCargando(false);
       return;
     }
 
+    window.localStorage.setItem('creatusitio_negocio_activo', nuevoNegocio.id);
+    window.dispatchEvent(new CustomEvent('creatusitio:negocio-activo', { detail: { id: nuevoNegocio.id } }));
     router.push('/panel');
   }
 
@@ -421,14 +453,16 @@ export default function Crear() {
               onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))}
               style={inputStyle}
             />
-            <input placeholder="Tu correo" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-            <input
-              placeholder="Contraseña"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{ ...inputStyle, marginBottom: 16 }}
-            />
+            {!revisandoSesion && usuarioSesion ? (
+              <div style={{ marginBottom: 16, padding: '12px 14px', borderRadius: 10, background: '#eef8f3', color: '#177455', fontSize: 12, lineHeight: 1.5 }}>
+                <strong>Se agregará a tu cuenta actual.</strong><br />No necesitas volver a escribir correo ni contraseña.
+              </div>
+            ) : !revisandoSesion ? (
+              <>
+                <input placeholder="Tu correo" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+                <input placeholder="Contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
+              </>
+            ) : null}
 
             {error && <p style={{ color: 'var(--color-accent)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 

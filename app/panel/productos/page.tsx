@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMiNegocio } from '@/lib/useMiNegocio';
 
 type Valor = { nombre: string; precioExtra: number };
@@ -22,6 +23,7 @@ function valoresATexto(valores: Valor[]): string {
 }
 
 export default function ProductosPanel() {
+  const router = useRouter();
   const { negocio, cargando, supabase } = useMiNegocio();
   const [productos, setProductos] = useState<any[]>([]);
   const [categorias, setCategorias] = useState<string[]>([]);
@@ -40,6 +42,10 @@ export default function ProductosPanel() {
 
   useEffect(() => {
     if (!negocio) return;
+    if (negocio.tipo !== 'tienda') {
+      router.replace('/panel');
+      return;
+    }
     setCategorias(negocio.categories || []);
     supabase
       .from('products')
@@ -146,7 +152,7 @@ export default function ProductosPanel() {
     setProductos(productos.map((x) => (x.id === p.id ? { ...x, disponible: !x.disponible } : x)));
   }
 
-  if (cargando) return <p>Cargando...</p>;
+  if (cargando || !negocio || negocio.tipo !== 'tienda') return <div className="panel-card panel-empty">Cargando tienda...</div>;
 
   return (
     <div>
@@ -154,7 +160,7 @@ export default function ProductosPanel() {
         <div>
           <div className="panel-eyebrow">Catálogo</div>
           <h1>Productos</h1>
-          <p>Agrega, organiza y controla lo que aparece en tu tienda o menú.</p>
+          <p>Agrega, organiza y controla lo que aparece en tu tienda.</p>
         </div>
         <div className="product-count">{productos.length} producto{productos.length === 1 ? '' : 's'}</div>
       </div>

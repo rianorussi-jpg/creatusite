@@ -47,6 +47,7 @@ export default function LandingProfesionista({ business }: { business: any; prod
   const telefono: string | undefined = config.telefono;
   const horarioTexto: string = config.horarioTexto || 'Lunes a Viernes | 9:00 - 18:00';
   const logoUrl: string | undefined = config.logoUrl;
+  const menuItems = (config.menuItems?.length ? config.menuItems : [{ label: 'Especialidades', href: '#especialidades', visible: true }, { label: 'Nosotros', href: '#nosotros', visible: true }, { label: 'Horarios', href: '#horarios', visible: true }, { label: 'Contacto', href: '#contacto', visible: true }]).filter((item: any) => item.visible !== false);
 
   const especialidades: Especialidad[] = config.especialidades?.length ? config.especialidades : ESPECIALIDADES_DEFAULT;
   const beneficios: Beneficio[] = config.beneficios?.length ? config.beneficios : BENEFICIOS_DEFAULT;
@@ -82,11 +83,10 @@ export default function LandingProfesionista({ business }: { business: any; prod
           ) : (
             <div style={{ fontSize: 26, fontWeight: 'bold', color: primary }}>{nombre}</div>
           )}
-          <nav style={{ display: 'flex', gap: 25 }}>
-            <a href="#especialidades" style={{ textDecoration: 'none', color: '#333' }}>Especialidades</a>
-            <a href="#nosotros" style={{ textDecoration: 'none', color: '#333' }}>Nosotros</a>
-            <a href="#horarios" style={{ textDecoration: 'none', color: '#333' }}>Horarios</a>
-            <a href="#contacto" style={{ textDecoration: 'none', color: '#333' }}>Contacto</a>
+          <nav style={{ display: 'flex', gap: 25, flexWrap: 'wrap', alignItems: 'center' }}>
+            {menuItems.map((item: any, index: number) => (
+              <a key={`${item.href}-${index}`} href={item.href} style={{ textDecoration: 'none', color: '#333' }}>{item.label}</a>
+            ))}
           </nav>
         </div>
       </header>

@@ -70,11 +70,13 @@ export default function ResumenPanel() {
           </div>
         </div>
         <div className="quick-grid">
-          <Link href="/panel/productos" className="quick-card panel-card">
-            <span className="quick-icon">□</span>
-            <div><strong>Administra productos</strong><small>Agrega precios, fotos y categorías.</small></div>
-            <b>→</b>
-          </Link>
+          {negocio.tipo === 'tienda' && (
+            <Link href="/panel/productos" className="quick-card panel-card">
+              <span className="quick-icon">□</span>
+              <div><strong>Administra productos</strong><small>Agrega precios, fotos y categorías.</small></div>
+              <b>→</b>
+            </Link>
+          )}
           <Link href="/panel/diseno" className="quick-card panel-card">
             <span className="quick-icon">✦</span>
             <div><strong>Personaliza el diseño</strong><small>Edita colores, logo y contenido.</small></div>

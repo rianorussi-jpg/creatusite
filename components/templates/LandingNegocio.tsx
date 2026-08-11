@@ -36,6 +36,7 @@ export default function LandingNegocio({ business }: { business: any; products?:
   const whatsapp: string | undefined = config.whatsapp;
   const instagram: string | undefined = config.instagram;
   const logoUrl: string | undefined = config.logoUrl;
+  const menuItems = (config.menuItems?.length ? config.menuItems : [{ label: 'Beneficios', href: '#beneficios', visible: true }, { label: 'Nosotros', href: '#nosotros', visible: true }, { label: 'Planes', href: '#planes', visible: true }, { label: 'Contacto', href: '#contacto', visible: true }]).filter((item: any) => item.visible !== false);
 
   const beneficios: Beneficio[] = config.beneficios?.length ? config.beneficios : BENEFICIOS_DEFAULT;
   const planes: Plan[] = config.planes?.length ? config.planes : PLANES_DEFAULT;
@@ -69,11 +70,10 @@ export default function LandingNegocio({ business }: { business: any; products?:
           ) : (
             <div style={{ fontSize: 22, fontWeight: 'bold' }}>{nombre}</div>
           )}
-          <nav style={{ display: 'flex', gap: 20 }}>
-            <a href="#beneficios" style={{ textDecoration: 'none', color: '#333' }}>Beneficios</a>
-            <a href="#nosotros" style={{ textDecoration: 'none', color: '#333' }}>Nosotros</a>
-            <a href="#planes" style={{ textDecoration: 'none', color: '#333' }}>Planes</a>
-            <a href="#contacto" style={{ textDecoration: 'none', color: '#333' }}>Contacto</a>
+          <nav style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+            {menuItems.map((item: any, index: number) => (
+              <a key={`${item.href}-${index}`} href={item.href} style={{ textDecoration: 'none', color: '#333' }}>{item.label}</a>
+            ))}
           </nav>
         </div>
       </header>

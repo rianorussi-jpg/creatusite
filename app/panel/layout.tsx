@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabaseClient';
+import { useMiNegocio } from '@/lib/useMiNegocio';
 
 const ITEMS = [
   { href: '/panel', label: 'Resumen', icon: '⌂', exact: true },
@@ -18,6 +19,7 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [verificando, setVerificando] = useState(true);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const { negocio, negocios, seleccionarNegocio } = useMiNegocio();
 
   useEffect(() => {
     let activo = true;
@@ -69,7 +71,7 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
 
         <div className="panel-nav-label">Tu negocio</div>
         <nav className="panel-nav">
-          {ITEMS.map((item) => {
+          {ITEMS.filter((item) => item.href !== '/panel/productos' || negocio?.tipo === 'tienda').map((item) => {
             const activo = item.exact ? pathname === item.href : pathname.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} className={`panel-nav-item ${activo ? 'active' : ''}`}>
@@ -102,7 +104,17 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
             <strong>Panel de administración</strong>
             <span>Administra tu sitio desde un solo lugar</span>
           </div>
-          <Link href="/crear" className="panel-top-action">Crear otro sitio</Link>
+          <div className="panel-top-actions">
+            {negocios.length > 1 && (
+              <label className="business-switcher">
+                <span>Configurando</span>
+                <select value={negocio?.id || ''} onChange={(e) => seleccionarNegocio(e.target.value)}>
+                  {negocios.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}
+                </select>
+              </label>
+            )}
+            <Link href="/crear" className="panel-top-action">＋ Crear otro sitio</Link>
+          </div>
         </header>
         <main className="panel-content">{children}</main>
       </div>
@@ -130,7 +142,7 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
         .panel-topbar>div{display:grid}
         .panel-topbar strong{font-size:13px}
         .panel-topbar span{margin-top:2px;color:#8a8d9b;font-size:10px}
-        .panel-top-action{margin-left:auto;padding:9px 13px;border:1px solid #d8d2c7;border-radius:9px;background:#fff;color:var(--color-ink);font-size:11px;font-weight:700;text-decoration:none}
+        .panel-top-actions{margin-left:auto;display:flex;align-items:center;gap:10px}.business-switcher{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 11px;border:1px solid #d8d2c7;border-radius:10px;background:#fff}.business-switcher span{margin:0!important;color:#8a8d9b;font-size:9px!important}.business-switcher select{max-width:180px;border:0;background:transparent;color:var(--color-ink);font:700 11px var(--font-body);outline:none;cursor:pointer}.panel-top-action{padding:9px 13px;border:1px solid #d8d2c7;border-radius:9px;background:#fff;color:var(--color-ink);font-size:11px;font-weight:700;text-decoration:none}
         .panel-menu-button{display:none;border:0;background:none;font-size:21px;cursor:pointer}
         .panel-content{max-width:1260px;margin:0 auto;padding:38px}
         .panel-page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:26px}
@@ -160,7 +172,7 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
           .panel-main{width:100%;margin-left:0}
           .panel-topbar{height:68px;padding:0 18px}
           .panel-content{padding:26px 18px}
-          .panel-top-action{display:none}
+          .panel-top-actions{margin-left:auto}.business-switcher span{display:none}.business-switcher select{max-width:120px}.panel-top-action{display:none}
           .panel-page-head{align-items:flex-start;flex-direction:column}
         }
       `}</style>
