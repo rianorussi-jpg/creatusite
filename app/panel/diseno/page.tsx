@@ -142,8 +142,8 @@ export default function DisenoPanel() {
         </aside>
 
         <section className="builder-controls panel-card">
-          {selected ? <BlockEditor block={selected} patch={(p)=>patchBlock(selected.id,p)} patchContent={(p)=>patchBlockContent(selected.id,p)} patchStyle={(p)=>patchBlockStyle(selected.id,p)} duplicate={()=>duplicateBlock(selected)} remove={()=>removeBlock(selected.id)} upload={(file)=>uploadImage(file,'block',selected.id)} subiendo={subiendo} /> : <div className="empty-editor">Agrega un bloque para empezar.</div>}
-          <GlobalEditor config={config} patchConfig={patchConfig} uploadLogo={(file)=>uploadImage(file,'logo')} subiendo={subiendo} />
+          {selected ? <BlockEditor block={selected} patch={(p: Partial<LandingBlock>)=>patchBlock(selected.id,p)} patchContent={(p: Record<string, any>)=>patchBlockContent(selected.id,p)} patchStyle={(p: Record<string, any>)=>patchBlockStyle(selected.id,p)} duplicate={()=>duplicateBlock(selected)} remove={()=>removeBlock(selected.id)} upload={(file: File)=>uploadImage(file,'block',selected.id)} subiendo={subiendo} /> : <div className="empty-editor">Agrega un bloque para empezar.</div>}
+          <GlobalEditor config={config} patchConfig={patchConfig} uploadLogo={(file: File)=>uploadImage(file,'logo')} subiendo={subiendo} />
         </section>
 
         <section className="preview-column">
@@ -167,7 +167,18 @@ export default function DisenoPanel() {
   );
 }
 
-function BlockEditor({ block, patch, patchContent, patchStyle, duplicate, remove, upload, subiendo }: any) {
+type BlockEditorProps = {
+  block: LandingBlock;
+  patch: (patch: Partial<LandingBlock>) => void;
+  patchContent: (patch: Record<string, any>) => void;
+  patchStyle: (patch: Record<string, any>) => void;
+  duplicate: () => void;
+  remove: () => void;
+  upload: (file: File) => void;
+  subiendo: boolean;
+};
+
+function BlockEditor({ block, patch, patchContent, patchStyle, duplicate, remove, upload, subiendo }: BlockEditorProps) {
   const items = block.content?.items || [];
   const setItem = (i: number, p: any) => { const next = [...items]; next[i] = { ...next[i], ...p }; patchContent({ items: next }); };
   const removeItem = (i: number) => patchContent({ items: items.filter((_: any, idx: number)=>idx!==i) });
@@ -203,7 +214,14 @@ function ItemEditor({ items, onSet, onRemove, onAdd, fields }: any) {
   return <div className="items-editor"><div className="items-title"><b>Elementos</b><button onClick={onAdd}>＋ Agregar</button></div>{items.map((item:any,i:number)=><div className="item-card" key={i}><div className="item-top"><span>#{i+1}</span><button onClick={()=>onRemove(i)}>×</button></div>{fields==='cards'&&<><input className="panel-input" value={item.title||''} onChange={(e)=>onSet(i,{title:e.target.value})} placeholder="Título"/><textarea className="panel-textarea" value={item.text||''} onChange={(e)=>onSet(i,{text:e.target.value})} placeholder="Descripción"/></>}{fields==='pricing'&&<><div className="two"><input className="panel-input" value={item.name||''} onChange={(e)=>onSet(i,{name:e.target.value})} placeholder="Nombre"/><input className="panel-input" value={item.price||''} onChange={(e)=>onSet(i,{price:e.target.value})} placeholder="$0"/></div><textarea className="panel-textarea" value={item.features||''} onChange={(e)=>onSet(i,{features:e.target.value})} placeholder="Una característica por línea"/><label className="featured"><input type="checkbox" checked={!!item.featured} onChange={(e)=>onSet(i,{featured:e.target.checked})}/> Destacar</label></>}{fields==='hours'&&<div className="two"><input className="panel-input" value={item.day||''} onChange={(e)=>onSet(i,{day:e.target.value})} placeholder="Día"/><input className="panel-input" value={item.hours||''} onChange={(e)=>onSet(i,{hours:e.target.value})} placeholder="Horario"/></div>}{fields==='testimonials'&&<><textarea className="panel-textarea" value={item.text||''} onChange={(e)=>onSet(i,{text:e.target.value})} placeholder="Testimonio"/><input className="panel-input" value={item.author||''} onChange={(e)=>onSet(i,{author:e.target.value})} placeholder="Autor"/></>}</div>)}<style jsx>{`.items-editor{margin-top:14px}.items-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.items-title b{font-size:10px}.items-title button{border:0;background:none;color:var(--color-accent);font-size:8px;font-weight:800;cursor:pointer}.item-card{display:grid;gap:6px;padding:10px;margin-bottom:7px;border:1px solid #e7e1d8;border-radius:9px;background:#faf9f6}.item-top{display:flex;justify-content:space-between}.item-top span{color:#a0a2aa;font-size:8px}.item-top button{border:0;background:none;color:#c24835;cursor:pointer}.two{display:grid;grid-template-columns:1fr 1fr;gap:6px}.featured{display:flex;gap:6px;align-items:center;font-size:8px}`}</style></div>;
 }
 
-function GlobalEditor({ config, patchConfig, uploadLogo, subiendo }: any) {
+type GlobalEditorProps = {
+  config: any;
+  patchConfig: (patch: Record<string, any>) => void;
+  uploadLogo: (file: File) => void;
+  subiendo: boolean;
+};
+
+function GlobalEditor({ config, patchConfig, uploadLogo, subiendo }: GlobalEditorProps) {
   const theme = config.theme || {};
   const patchTheme = (p:any)=>patchConfig({theme:{...theme,...p}});
   return <div className="global-editor"><div className="global-title"><span>◉</span><div><b>Diseño global</b><small>Se aplica a toda la página</small></div></div><Field label="Nombre del sitio"><input className="panel-input" value={config.siteName||''} onChange={(e)=>patchConfig({siteName:e.target.value})}/></Field><Field label="Logo"><label className="upload-logo"><input type="file" accept="image/*" onChange={(e)=>e.target.files?.[0]&&uploadLogo(e.target.files[0])}/><span>{subiendo?'Subiendo...':'↑ Subir logo'}</span></label></Field><div className="theme-colors"><Field label="Principal"><input type="color" value={theme.primary||'#2563eb'} onChange={(e)=>patchTheme({primary:e.target.value})}/></Field><Field label="Fondo"><input type="color" value={theme.background||'#f5f7fb'} onChange={(e)=>patchTheme({background:e.target.value})}/></Field><Field label="Texto"><input type="color" value={theme.text||'#1f2937'} onChange={(e)=>patchTheme({text:e.target.value})}/></Field></div><Field label="Estilo de esquinas"><select className="panel-select" value={theme.radius||'rounded'} onChange={(e)=>patchTheme({radius:e.target.value})}><option value="soft">Suaves</option><option value="rounded">Redondeadas</option><option value="pill">Muy redondeadas</option></select></Field><Field label="Tipografía de títulos"><select className="panel-select" value={theme.headingFont||'Arial, Helvetica, sans-serif'} onChange={(e)=>patchTheme({headingFont:e.target.value})}><option value="Arial, Helvetica, sans-serif">Moderna</option><option value="Georgia, Times, serif">Editorial</option><option value="Trebuchet MS, Arial, sans-serif">Amigable</option><option value="Courier New, monospace">Monoespaciada</option></select></Field><Field label="Tipografía de texto"><select className="panel-select" value={theme.bodyFont||'Arial, Helvetica, sans-serif'} onChange={(e)=>patchTheme({bodyFont:e.target.value})}><option value="Arial, Helvetica, sans-serif">Arial</option><option value="Georgia, Times, serif">Georgia</option><option value="Trebuchet MS, Arial, sans-serif">Trebuchet</option><option value="Courier New, monospace">Courier</option></select></Field><Field label="Botones"><select className="panel-select" value={theme.buttonStyle||'pill'} onChange={(e)=>patchTheme({buttonStyle:e.target.value})}><option value="solid">Sólidos</option><option value="outline">Contorno</option><option value="pill">Píldora</option></select></Field><Field label="Texto del botón del menú"><input className="panel-input" value={config.header?.ctaLabel||'WhatsApp'} onChange={(e)=>patchConfig({header:{...(config.header||{}),ctaLabel:e.target.value}})}/></Field><style jsx>{`.global-editor{margin-top:18px;padding-top:18px;border-top:1px solid #e7e1d8}.global-title{display:flex;align-items:center;gap:9px;margin-bottom:15px}.global-title>span{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#edf0f8}.global-title>div{display:grid;gap:2px}.global-title b{font-size:11px}.global-title small{color:#999ca5;font-size:8px}.upload-logo input{display:none}.upload-logo span{display:grid;place-items:center;min-height:40px;border:1px dashed #ccc5ba;border-radius:8px;background:#faf9f6;font-size:8px;font-weight:800;cursor:pointer}.theme-colors{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.theme-colors input{width:100%;height:35px;padding:2px;border:1px solid #ddd8ce;border-radius:7px;background:#fff}`}</style></div>;
