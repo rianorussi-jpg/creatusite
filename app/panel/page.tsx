@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useMiNegocio } from '@/lib/useMiNegocio';
 
+const TEMPLATE_LABELS: Record<string,string> = { 'landing-negocio': 'Impulso', 'landing-profesionista': 'Esencia', 'tienda-moderno': 'Minimalista', 'tienda-directo': 'Colores' };
+
 export default function ResumenPanel() {
   const { negocio, cargando } = useMiNegocio();
 
@@ -52,7 +54,7 @@ export default function ResumenPanel() {
         </div>
         <div className="panel-card stat-card">
           <span>Plantilla activa</span>
-          <strong>{negocio.template_id || 'Sin elegir'}</strong>
+          <strong>{TEMPLATE_LABELS[negocio.template_id] || negocio.template_id || 'Sin elegir'}</strong>
           <small>Puedes cambiarla sin perder contenido</small>
         </div>
         <div className="panel-card stat-card">

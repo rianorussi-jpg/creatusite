@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useMiNegocio } from '@/lib/useMiNegocio';
+import { legacyBlocks } from '@/components/templates/LandingFlexible';
 
 const OPCIONES_POR_TIPO: Record<string, { id: string; nombre: string; descripcion: string; estilo: string }[]> = {
   tienda: [
@@ -9,8 +10,8 @@ const OPCIONES_POR_TIPO: Record<string, { id: string; nombre: string; descripcio
     { id: 'tienda-directo', nombre: 'Colores', descripcion: 'Diseño llamativo en rojo y amarillo con catálogo más directo.', estilo: 'direct' }
   ],
   landing: [
-    { id: 'landing-negocio', nombre: 'Negocio', descripcion: 'Hero, beneficios, planes y testimonios para presentar servicios o una empresa.', estilo: 'negocio' },
-    { id: 'landing-profesionista', nombre: 'Profesionista', descripcion: 'Especialidades, horarios y contacto para profesionistas y consultorios.', estilo: 'profesionista' }
+    { id: 'landing-negocio', nombre: 'Impulso', descripcion: 'Estilo moderno, enérgico y comercial. Úsalo como punto de partida y cambia todos sus bloques.', estilo: 'negocio' },
+    { id: 'landing-profesionista', nombre: 'Esencia', descripcion: 'Estilo elegante, limpio y editorial. Ideal para una presencia más sobria y totalmente personalizable.', estilo: 'profesionista' }
   ]
 };
 
@@ -22,23 +23,14 @@ export default function PlantillaPanel() {
   async function elegir(id: string) {
     if (!negocio || id === negocio.template_id) return;
     setGuardando(id);
-    let siguienteConfig = negocio.config || {};
-    if (id === 'landing-negocio') {
-      siguienteConfig = { ...siguienteConfig, menuItems: [
-        { label: 'Beneficios', href: '#beneficios', visible: true },
-        { label: 'Nosotros', href: '#nosotros', visible: true },
-        { label: 'Planes', href: '#planes', visible: true },
-        { label: 'Contacto', href: '#contacto', visible: true }
-      ]};
-    }
-    if (id === 'landing-profesionista') {
-      siguienteConfig = { ...siguienteConfig, menuItems: [
-        { label: 'Especialidades', href: '#especialidades', visible: true },
-        { label: 'Nosotros', href: '#nosotros', visible: true },
-        { label: 'Horarios', href: '#horarios', visible: true },
-        { label: 'Contacto', href: '#contacto', visible: true }
-      ]};
-    }
+    const tema = id === 'landing-profesionista'
+      ? { primary: '#0d5c63', background: '#fafafa', surface: '#ffffff', text: '#263238', headingFont: 'Georgia, Times, serif', bodyFont: 'Arial, Helvetica, sans-serif', radius: 'soft', buttonStyle: 'solid' }
+      : id === 'landing-negocio'
+      ? { primary: '#2563eb', background: '#f5f7fb', surface: '#ffffff', text: '#1f2937', headingFont: 'Arial, Helvetica, sans-serif', bodyFont: 'Arial, Helvetica, sans-serif', radius: 'rounded', buttonStyle: 'pill' }
+      : negocio.config?.theme;
+    const presetActual = negocio.template_id === 'landing-profesionista' ? 'esencia' : 'impulso';
+    const bloquesActuales = id.startsWith('landing-') ? legacyBlocks(negocio.config || {}, presetActual) : negocio.config?.blocks;
+    const siguienteConfig = id.startsWith('landing-') ? { ...(negocio.config || {}), blocks: bloquesActuales, theme: tema } : negocio.config;
     const { error } = await supabase.from('businesses').update({ template_id: id, config: siguienteConfig }).eq('id', negocio.id);
     if (!error) setNegocio({ ...negocio, template_id: id, config: siguienteConfig });
     setGuardando('');

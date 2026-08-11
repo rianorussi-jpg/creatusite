@@ -22,8 +22,8 @@ const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descrip
     { id: 'tienda-directo', nombre: 'Colores', descripcion: 'Diseño llamativo en rojo y amarillo, con categorías visibles y compra más directa.' }
   ],
   landing: [
-    { id: 'landing-negocio', nombre: 'Negocio', descripcion: 'Hero, beneficios, planes de precio y testimonios. Ideal para negocios y servicios en general.' },
-    { id: 'landing-profesionista', nombre: 'Profesionista', descripcion: 'Contacto, especialidades, horarios y formulario de citas. Ideal para profesionistas y consultorios.' }
+    { id: 'landing-negocio', nombre: 'Impulso', descripcion: 'Moderna, dinámica y enfocada en convertir. Después podrás mover, agregar y personalizar todos los bloques.' },
+    { id: 'landing-profesionista', nombre: 'Esencia', descripcion: 'Elegante, limpia y editorial. Después podrás transformar cada sección, color y contenido.' }
   ]
 };
 
@@ -210,11 +210,12 @@ export default function Crear() {
       .replace(/^-|-$/g, '');
 
   function configInicial(tpl: TemplateId): Record<string, any> {
-    const base = { titulo: nombre, colorPrimario: '#111111', descripcion: '', whatsapp, instagram: '' };
+    const base = { titulo: nombre, siteName: nombre, colorPrimario: '#111111', descripcion: '', whatsapp, instagram: '', header: { sticky: true, ctaLabel: 'WhatsApp' } };
 
     if (tpl === 'landing-negocio') {
       return {
         ...base,
+        theme: { primary: '#2563eb', background: '#f5f7fb', surface: '#ffffff', text: '#1f2937', headingFont: 'Arial, Helvetica, sans-serif', bodyFont: 'Arial, Helvetica, sans-serif', radius: 'rounded', buttonStyle: 'pill' },
         menuItems: [
           { label: 'Beneficios', href: '#beneficios', visible: true },
           { label: 'Nosotros', href: '#nosotros', visible: true },
@@ -241,6 +242,7 @@ export default function Crear() {
     if (tpl === 'landing-profesionista') {
       return {
         ...base,
+        theme: { primary: '#0d5c63', background: '#fafafa', surface: '#ffffff', text: '#263238', headingFont: 'Georgia, Times, serif', bodyFont: 'Arial, Helvetica, sans-serif', radius: 'soft', buttonStyle: 'solid' },
         telefono: '',
         horarioTexto: 'Lunes a Viernes | 9:00 - 18:00',
         menuItems: [
