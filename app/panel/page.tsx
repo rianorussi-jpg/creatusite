@@ -11,7 +11,8 @@ export default function ResumenPanel() {
   if (cargando) return <div className="panel-card panel-empty">Cargando información...</div>;
   if (!negocio) return <div className="panel-card panel-empty">No encontramos tu negocio. Inicia sesión de nuevo.</div>;
 
-  const url = `https://${negocio.subdominio}.creatusitio.mx`;
+  const dominioBase = negocio.dominio_base || 'creatusitio.mx';
+  const url = `https://${negocio.subdominio}.${dominioBase}`;
   const activo = negocio.estado === 'activo';
 
   return (
@@ -35,7 +36,7 @@ export default function ResumenPanel() {
           <h2>Tu página está lista para recibir visitas.</h2>
           <p>Comparte este enlace con tus clientes en WhatsApp, Instagram o donde prefieras.</p>
           <a href={url} target="_blank" rel="noreferrer" className="site-url">
-            {negocio.subdominio}.creatusitio.mx <span>↗</span>
+            {negocio.subdominio}.{dominioBase} <span>↗</span>
           </a>
         </div>
         <div className="summary-illustration">

@@ -14,6 +14,7 @@ declare global {
 }
 
 type Tipo = 'tienda' | 'landing';
+type DominioBase = 'creatusitio.mx' | 'enla.mx';
 type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'landing-lienzo' | 'tienda-moderno' | 'tienda-directo';
 
 const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descripcion: string }[]> = {
@@ -184,6 +185,7 @@ export default function Crear() {
   const [template, setTemplate] = useState<TemplateId | null>(null);
   const [nombre, setNombre] = useState('');
   const [subdominio, setSubdominio] = useState('');
+  const [dominioBase, setDominioBase] = useState<DominioBase>('creatusitio.mx');
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -347,10 +349,11 @@ export default function Crear() {
       .from('businesses')
       .select('id')
       .eq('subdominio', subdominio)
+      .eq('dominio_base', dominioBase)
       .maybeSingle();
 
     if (existente) {
-      setError('Ese subdominio ya está en uso, elige otro.');
+      setError(`La dirección ${subdominio}.${dominioBase} ya está en uso. Prueba otro nombre o el otro dominio.`);
       setCargando(false);
       return;
     }
@@ -377,6 +380,7 @@ export default function Crear() {
       nombre,
       tipo,
       subdominio,
+      dominio_base: dominioBase,
       template_id: template === 'landing-lienzo' ? 'landing-negocio' : template,
       config: configInicial(template)
     }).select('id').single();
@@ -475,14 +479,48 @@ export default function Crear() {
 
             <input placeholder="Nombre del negocio" value={nombre} onChange={(e) => setNombre(e.target.value)} style={inputStyle} />
 
-            <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid var(--color-border)', borderRadius: 10, marginBottom: 10, overflow: 'hidden' }}>
-              <input
-                placeholder="tunegocio"
-                value={subdominio}
-                onChange={(e) => setSubdominio(normalizarSubdominio(e.target.value))}
-                style={{ ...inputStyle, border: 'none', marginBottom: 0, borderRadius: 0 }}
-              />
-              <span style={{ paddingRight: 14, color: 'var(--color-ink-soft)', fontSize: 13, fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>.creatusitio.mx</span>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: 'block', marginBottom: 7, color: 'var(--color-ink)', fontSize: 12, fontWeight: 700 }}>
+                Elige la dirección de tu página
+              </label>
+              <div style={{ display: 'flex', alignItems: 'stretch', border: '1.5px solid var(--color-border)', borderRadius: 10, overflow: 'hidden', background: '#fff' }}>
+                <input
+                  placeholder="tunegocio"
+                  value={subdominio}
+                  onChange={(e) => setSubdominio(normalizarSubdominio(e.target.value))}
+                  style={{ ...inputStyle, flex: 1, minWidth: 0, border: 'none', marginBottom: 0, borderRadius: 0 }}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', borderLeft: '1px solid var(--color-border)', background: '#faf9f6' }}>
+                  <span style={{ paddingLeft: 10, color: 'var(--color-ink-soft)', fontSize: 13, fontFamily: 'var(--font-mono)' }}>.</span>
+                  <select
+                    value={dominioBase}
+                    onChange={(e) => setDominioBase(e.target.value as DominioBase)}
+                    aria-label="Dominio base"
+                    style={{
+                      height: '100%',
+                      minHeight: 48,
+                      padding: '0 12px 0 4px',
+                      border: 0,
+                      background: 'transparent',
+                      color: 'var(--color-ink)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="creatusitio.mx">creatusitio.mx</option>
+                    <option value="enla.mx">enla.mx</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 7, color: 'var(--color-ink-soft)', fontSize: 10 }}>
+                <span>Tu página quedará publicada en:</span>
+                <strong style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                  {subdominio || 'tunegocio'}.{dominioBase}
+                </strong>
+              </div>
             </div>
 
             <input

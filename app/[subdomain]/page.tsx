@@ -12,15 +12,42 @@ const TEMPLATES: Record<string, any> = {
   'tienda-directo': TiendaDirecto
 };
 
-export default async function PaginaNegocio({ params }: { params: { subdomain: string } }) {
-  const supabase = supabaseServer();
+type DominioBase = 'creatusitio.mx' | 'enla.mx';
 
-  const { data: business } = await supabase
+function dominioSeguro(valor?: string): DominioBase {
+  return valor === 'enla.mx' ? 'enla.mx' : 'creatusitio.mx';
+}
+
+export default async function PaginaNegocio({
+  params,
+  searchParams
+}: {
+  params: { subdomain: string };
+  searchParams?: { __dominio?: string };
+}) {
+  const supabase = supabaseServer();
+  const dominioBase = dominioSeguro(searchParams?.__dominio);
+
+  let { data: business } = await supabase
     .from('businesses')
     .select('*')
     .eq('subdominio', params.subdomain)
+    .eq('dominio_base', dominioBase)
     .eq('estado', 'activo')
     .maybeSingle();
+
+  // Compatibilidad temporal con registros viejos antes de ejecutar/backfillear la migración.
+  if (!business && dominioBase === 'creatusitio.mx') {
+    const legacy = await supabase
+      .from('businesses')
+      .select('*')
+      .eq('subdominio', params.subdomain)
+      .is('dominio_base', null)
+      .eq('estado', 'activo')
+      .maybeSingle();
+
+    business = legacy.data;
+  }
 
   if (!business) notFound();
 
