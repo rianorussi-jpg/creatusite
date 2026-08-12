@@ -14,7 +14,7 @@ declare global {
 }
 
 type Tipo = 'tienda' | 'landing';
-type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'tienda-moderno' | 'tienda-directo';
+type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'landing-lienzo' | 'tienda-moderno' | 'tienda-directo';
 
 const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descripcion: string }[]> = {
   tienda: [
@@ -23,7 +23,8 @@ const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descrip
   ],
   landing: [
     { id: 'landing-negocio', nombre: 'Impulso', descripcion: 'Moderna, dinámica y enfocada en convertir. Después podrás mover, agregar y personalizar todos los bloques.' },
-    { id: 'landing-profesionista', nombre: 'Esencia', descripcion: 'Elegante, limpia y editorial. Después podrás transformar cada sección, color y contenido.' }
+    { id: 'landing-profesionista', nombre: 'Esencia', descripcion: 'Elegante, limpia y editorial. Después podrás transformar cada sección, color y contenido.' },
+    { id: 'landing-lienzo', nombre: 'Lienzo', descripcion: 'La opción más libre: una base neutra hecha para agregar, quitar y repetir bloques y crear cientos de combinaciones.' }
   ]
 };
 
@@ -125,6 +126,23 @@ function VistaPreviaPlantilla({ id }: { id: TemplateId }) {
     );
   }
 
+  if (id === 'landing-lienzo') {
+    return (
+      <div style={{ ...shell, background: '#fbfbfe', padding: 12 }}>
+        <div style={{ height: 31, borderRadius: '9px 9px 0 0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px' }}>
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#7c3aed' }}>TU MARCA</span>
+          <div style={{ display: 'flex', gap: 6 }}>{[1,2,3].map(n => <span key={n} style={{ ...line('20px'), height: 4 }} />)}</div>
+        </div>
+        <div style={{ padding: '18px 14px 14px', textAlign: 'center', background: 'linear-gradient(145deg,#f6f1ff,#ffffff)' }}>
+          <div style={{ width: '72%', height: 14, margin: '0 auto', borderRadius: 999, background: '#171526' }} />
+          <div style={{ width: '54%', height: 5, margin: '9px auto 0', borderRadius: 999, background: '#cfc7df' }} />
+          <div style={{ width: 66, height: 21, margin: '12px auto 0', borderRadius: 999, border: '2px solid #7c3aed' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 7, padding: 10, background: '#fff' }}>{[1,2,3].map(n => <div key={n} style={{ height: 48, borderRadius: 9, background: n === 2 ? '#7c3aed18' : '#f4f1f8', border: '1px solid #e8e1f2' }} />)}</div>
+      </div>
+    );
+  }
+
   if (id === 'landing-profesionista') {
     return (
       <div style={{ ...shell, background: '#fafafa' }}>
@@ -212,9 +230,26 @@ export default function Crear() {
   function configInicial(tpl: TemplateId): Record<string, any> {
     const base = { titulo: nombre, siteName: nombre, colorPrimario: '#111111', descripcion: '', whatsapp, instagram: '', header: { sticky: true, ctaLabel: 'WhatsApp' } };
 
+    if (tpl === 'landing-lienzo') {
+      return {
+        ...base,
+        builderPreset: 'lienzo',
+        theme: { primary: '#7c3aed', background: '#fbfbfe', surface: '#ffffff', text: '#171526', headingFont: 'Trebuchet MS, Arial, sans-serif', bodyFont: 'Arial, Helvetica, sans-serif', radius: 'rounded', buttonStyle: 'outline' },
+        blocks: [
+          { id: 'hero', type: 'hero', title: nombre || 'Tu negocio', subtitle: 'Una base flexible para construir una página totalmente a tu manera.', visible: true, showInMenu: false, variant: 'centered', style: { accentColor: '#7c3aed' }, content: { buttonText: 'Contáctanos', imageUrl: '' } },
+          { id: 'servicios', type: 'services', title: 'Lo que hacemos', visible: true, showInMenu: true, menuLabel: 'Servicios', variant: 'cards', style: { accentColor: '#7c3aed' }, content: { items: [{ title: 'Servicio principal', text: 'Describe aquí lo que ofreces.' }, { title: 'Otra solución', text: 'Agrega otra forma de ayudar.' }, { title: 'Algo diferente', text: 'Destaca lo que te hace especial.' }] } },
+          { id: 'galeria', type: 'gallery', title: 'Galería', visible: true, showInMenu: true, menuLabel: 'Galería', variant: 'grid', style: { accentColor: '#7c3aed' }, content: { images: [] } },
+          { id: 'nosotros', type: 'about', title: 'Nuestra historia', visible: true, showInMenu: true, menuLabel: 'Nosotros', variant: 'image-left', style: { accentColor: '#7c3aed' }, content: { text: 'Cuenta aquí quién eres y qué hace especial a tu proyecto.', imageUrl: '' } },
+          { id: 'accion', type: 'cta', title: '¿Listo para dar el siguiente paso?', subtitle: 'Convierte esta sección en el mensaje que necesites.', visible: true, showInMenu: false, variant: 'banner', style: { accentColor: '#7c3aed' }, content: { buttonText: 'Escríbenos' } },
+          { id: 'contacto', type: 'contact', title: 'Hablemos', subtitle: 'Déjanos tus datos o escríbenos por WhatsApp.', visible: true, showInMenu: true, menuLabel: 'Contacto', variant: 'form', style: { accentColor: '#7c3aed' }, content: { buttonText: 'Enviar mensaje' } }
+        ]
+      };
+    }
+
     if (tpl === 'landing-negocio') {
       return {
         ...base,
+        builderPreset: 'impulso',
         theme: { primary: '#2563eb', background: '#f5f7fb', surface: '#ffffff', text: '#1f2937', headingFont: 'Arial, Helvetica, sans-serif', bodyFont: 'Arial, Helvetica, sans-serif', radius: 'rounded', buttonStyle: 'pill' },
         menuItems: [
           { label: 'Beneficios', href: '#beneficios', visible: true },
@@ -242,6 +277,7 @@ export default function Crear() {
     if (tpl === 'landing-profesionista') {
       return {
         ...base,
+        builderPreset: 'esencia',
         theme: { primary: '#0d5c63', background: '#fafafa', surface: '#ffffff', text: '#263238', headingFont: 'Georgia, Times, serif', bodyFont: 'Arial, Helvetica, sans-serif', radius: 'soft', buttonStyle: 'solid' },
         telefono: '',
         horarioTexto: 'Lunes a Viernes | 9:00 - 18:00',
@@ -341,7 +377,7 @@ export default function Crear() {
       nombre,
       tipo,
       subdominio,
-      template_id: template,
+      template_id: template === 'landing-lienzo' ? 'landing-negocio' : template,
       config: configInicial(template)
     }).select('id').single();
 

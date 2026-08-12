@@ -1,5 +1,6 @@
 'use client';
-import LandingFlexible from './LandingFlexible';
+import LandingFlexible, { type LandingPreset } from './LandingFlexible';
 export default function LandingNegocio({ business }: { business: any; products?: any[] }) {
-  return <LandingFlexible business={business} preset="impulso" />;
+  const preset: LandingPreset = business?.config?.builderPreset === 'lienzo' ? 'lienzo' : 'impulso';
+  return <LandingFlexible business={business} preset={preset} />;
 }
