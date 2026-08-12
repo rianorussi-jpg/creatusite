@@ -391,6 +391,34 @@ export default function Crear() {
       return;
     }
 
+    if (dominioBase === 'enla.mx') {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+
+        if (accessToken) {
+          const provisionRes = await fetch('/api/provision-enla', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({ businessId: nuevoNegocio.id })
+          });
+
+          const provisionData = await provisionRes.json().catch(() => null);
+
+          if (!provisionRes.ok || !provisionData?.success) {
+            console.error('No se pudo aprovisionar enla.mx:', provisionData);
+          }
+        } else {
+          console.error('No hay access token para aprovisionar enla.mx');
+        }
+      } catch (provisionError) {
+        console.error('Error aprovisionando enla.mx:', provisionError);
+      }
+    }
+
     window.localStorage.setItem('creatusitio_negocio_activo', nuevoNegocio.id);
     window.dispatchEvent(new CustomEvent('creatusitio:negocio-activo', { detail: { id: nuevoNegocio.id } }));
     router.push('/panel');
