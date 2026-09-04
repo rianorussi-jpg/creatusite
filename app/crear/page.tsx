@@ -41,52 +41,113 @@ const TIPO_LABEL: Record<Tipo, { titulo: string; sub: string }> = {
 
 
 function TipoIcon({ tipo }: { tipo: Tipo }) {
-  const common = {
-    width: 22,
-    height: 22,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.8,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true
+  const frame: React.CSSProperties = {
+    width: 58,
+    height: 58,
+    display: 'block',
+    flex: '0 0 auto'
   };
 
   if (tipo === 'tienda') {
     return (
-      <svg {...common}>
-        <path d="M3.5 9.25h17" />
-        <path d="M5 9.25V20h14V9.25" />
-        <path d="M4.2 9.25 5.7 4h12.6l1.5 5.25" />
-        <path d="M8 20v-5.5h4V20" />
-        <path d="M5.1 9.25c0 1.35 1 2.25 2.2 2.25s2.2-.9 2.2-2.25c0 1.35 1 2.25 2.5 2.25s2.5-.9 2.5-2.25c0 1.35 1 2.25 2.2 2.25s2.2-.9 2.2-2.25" />
+      <svg style={frame} viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="shop-bg" x1="8" y1="5" x2="56" y2="59" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#EEF6FF" />
+            <stop offset="1" stopColor="#DDEBFF" />
+          </linearGradient>
+          <linearGradient id="shop-awning" x1="17" y1="17" x2="47" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#2667FF" />
+            <stop offset="1" stopColor="#5B8CFF" />
+          </linearGradient>
+          <filter id="shop-shadow" x="8" y="9" width="48" height="48" filterUnits="userSpaceOnUse">
+            <feDropShadow dx="0" dy="3" stdDeviation="2.5" floodColor="#1746A2" floodOpacity="0.16" />
+          </filter>
+        </defs>
+        <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#shop-bg)" />
+        <circle cx="50" cy="14" r="5" fill="#fff" fillOpacity="0.72" />
+        <circle cx="12" cy="49" r="4" fill="#C8DBFF" />
+        <g filter="url(#shop-shadow)">
+          <path d="M17 27.5h30V48a3 3 0 0 1-3 3H20a3 3 0 0 1-3-3V27.5Z" fill="#fff" />
+          <path d="M16.2 26.5 19.7 16h24.6l3.5 10.5H16.2Z" fill="url(#shop-awning)" />
+          <path d="M16.2 26.5h31.6v2.2a4 4 0 0 1-7.9.9 4 4 0 0 1-7.9 0 4 4 0 0 1-7.9 0 4 4 0 0 1-7.9-.9v-2.2Z" fill="#DCE7FF" />
+          <path d="M16.2 26.5h7.9v2.2a4 4 0 0 1-7.9 0v-2.2ZM32 26.5h7.9v2.2a4 4 0 0 1-7.9 0v-2.2Z" fill="#8CB0FF" />
+          <rect x="21" y="35" width="10" height="16" rx="2.2" fill="#EAF1FF" />
+          <rect x="35" y="35" width="8" height="8" rx="2" fill="#D6E4FF" />
+          <path d="M37.5 36.8h3M37.5 39.5h3" stroke="#2667FF" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M25 39.5h2" stroke="#2667FF" strokeWidth="1.7" strokeLinecap="round" />
+        </g>
+        <path d="M42.5 10.5c1.4 0 2.5-1.1 2.5-2.5 0 1.4 1.1 2.5 2.5 2.5-1.4 0-2.5 1.1-2.5 2.5 0-1.4-1.1-2.5-2.5-2.5Z" fill="#2667FF" />
       </svg>
     );
   }
 
   if (tipo === 'menu') {
     return (
-      <svg {...common}>
-        <path d="M6 3.75h12a1.5 1.5 0 0 1 1.5 1.5v13.5A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5V5.25A1.5 1.5 0 0 1 6 3.75Z" />
-        <path d="M8 7.5h8" />
-        <path d="M8 11h3.5" />
-        <path d="M8 14.5h3.5" />
-        <path d="M15.25 10.75v5.5" />
-        <path d="M13.75 12.5c.25-1 .75-1.75 1.5-1.75s1.25.75 1.5 1.75" />
+      <svg style={frame} viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="menu-bg" x1="8" y1="7" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#FFF7E8" />
+            <stop offset="1" stopColor="#FFE7BC" />
+          </linearGradient>
+          <linearGradient id="menu-card" x1="22" y1="16" x2="44" y2="49" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#FF9D32" />
+            <stop offset="1" stopColor="#F47721" />
+          </linearGradient>
+          <filter id="menu-shadow" x="10" y="9" width="46" height="48" filterUnits="userSpaceOnUse">
+            <feDropShadow dx="0" dy="3" stdDeviation="2.5" floodColor="#B95A16" floodOpacity="0.18" />
+          </filter>
+        </defs>
+        <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#menu-bg)" />
+        <circle cx="50" cy="16" r="5" fill="#fff" fillOpacity="0.7" />
+        <circle cx="13" cy="47" r="4" fill="#FFD89D" />
+        <g filter="url(#menu-shadow)">
+          <rect x="20" y="13" width="26" height="38" rx="5" fill="url(#menu-card)" />
+          <rect x="23" y="16" width="20" height="32" rx="3.5" fill="#FFFDF8" />
+          <circle cx="33" cy="25" r="5.5" fill="#FFE5B9" />
+          <path d="M29.8 24.8c1.4-2.2 5-2.5 6.6-.3-1.3 2.2-5.1 2.5-6.6.3Z" fill="#F47721" />
+          <circle cx="33.2" cy="24.2" r="1.1" fill="#FFF7E8" />
+          <path d="M28 35h10M28 39h7.5" stroke="#D9B47A" strokeWidth="2" strokeLinecap="round" />
+          <path d="M16.5 21v18M14.5 21v7.5c0 2 1 3 2 3s2-1 2-3V21M16.5 31.5V41" stroke="#8E5B2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M49 21c2.8 2.7 2.8 7.4 0 10.1V41" stroke="#8E5B2D" strokeWidth="1.8" strokeLinecap="round" />
+        </g>
+        <path d="M45 11c1.2 0 2.2-1 2.2-2.2 0 1.2 1 2.2 2.2 2.2-1.2 0-2.2 1-2.2 2.2 0-1.2-1-2.2-2.2-2.2Z" fill="#F47721" />
       </svg>
     );
   }
 
   return (
-    <svg {...common}>
-      <rect x="3.5" y="4" width="17" height="16" rx="2" />
-      <path d="M3.5 8h17" />
-      <circle cx="6.5" cy="6" r=".55" fill="currentColor" stroke="none" />
-      <circle cx="8.5" cy="6" r=".55" fill="currentColor" stroke="none" />
-      <path d="M7.25 12h9.5" />
-      <path d="M9.25 15.25h5.5" />
-      <path d="M10.25 18h3.5" />
+    <svg style={frame} viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="landing-bg" x1="7" y1="7" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F4EEFF" />
+          <stop offset="1" stopColor="#E5D8FF" />
+        </linearGradient>
+        <linearGradient id="landing-hero" x1="20" y1="25" x2="47" y2="37" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#7754E8" />
+          <stop offset="1" stopColor="#9D79FF" />
+        </linearGradient>
+        <filter id="landing-shadow" x="8" y="9" width="48" height="47" filterUnits="userSpaceOnUse">
+          <feDropShadow dx="0" dy="3" stdDeviation="2.5" floodColor="#4A30A2" floodOpacity="0.17" />
+        </filter>
+      </defs>
+      <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#landing-bg)" />
+      <circle cx="50" cy="15" r="5" fill="#fff" fillOpacity="0.7" />
+      <circle cx="13" cy="49" r="4" fill="#D7C7FF" />
+      <g filter="url(#landing-shadow)">
+        <rect x="13" y="14" width="38" height="36" rx="5" fill="#fff" />
+        <path d="M13 19a5 5 0 0 1 5-5h28a5 5 0 0 1 5 5v3H13v-3Z" fill="#ECE6FA" />
+        <circle cx="18" cy="18" r="1.25" fill="#A994E5" />
+        <circle cx="22" cy="18" r="1.25" fill="#BDAEF0" />
+        <circle cx="26" cy="18" r="1.25" fill="#D0C6F5" />
+        <rect x="17" y="26" width="30" height="10" rx="3.5" fill="url(#landing-hero)" />
+        <path d="M20 29.5h9M20 32.5h6" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+        <rect x="38" y="29" width="6" height="4" rx="2" fill="#fff" fillOpacity="0.95" />
+        <rect x="17" y="40" width="8" height="6" rx="2" fill="#F0EBFC" />
+        <rect x="28" y="40" width="8" height="6" rx="2" fill="#F0EBFC" />
+        <rect x="39" y="40" width="8" height="6" rx="2" fill="#F0EBFC" />
+      </g>
+      <path d="M45 10.5c1.3 0 2.3-1 2.3-2.3 0 1.3 1 2.3 2.3 2.3-1.3 0-2.3 1-2.3 2.3 0-1.3-1-2.3-2.3-2.3Z" fill="#7754E8" />
     </svg>
   );
 }
