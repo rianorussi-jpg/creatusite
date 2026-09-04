@@ -15,7 +15,7 @@ declare global {
 
 type Tipo = 'tienda' | 'landing' | 'menu';
 type DominioBase = 'creatusitio.mx' | 'enla.mx';
-type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'landing-lienzo' | 'tienda-moderno' | 'tienda-directo' | 'menu-informativo';
+type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'landing-lienzo' | 'tienda-moderno' | 'tienda-directo' | 'menu-informativo' | 'menu-galeria';
 
 const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descripcion: string }[]> = {
   tienda: [
@@ -23,7 +23,8 @@ const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descrip
     { id: 'tienda-directo', nombre: 'Colores', descripcion: 'Diseño llamativo en rojo y amarillo, con categorías visibles y compra más directa.' }
   ],
   menu: [
-    { id: 'menu-informativo', nombre: 'Carta visual', descripcion: 'Menú informativo con categorías, fotos, descripciones y precios. Sin carrito ni pedidos.' }
+    { id: 'menu-informativo', nombre: 'Carta visual', descripcion: 'Menú limpio y elegante con categorías, fotos, descripciones y precios.' },
+    { id: 'menu-galeria', nombre: 'Galería', descripcion: 'Menú muy visual: fotografías grandes y protagonistas, ideal para comida, postres, bebidas o portafolios.' }
   ],
   landing: [
     { id: 'landing-negocio', nombre: 'Impulso', descripcion: 'Moderna, dinámica y enfocada en convertir. Después podrás mover, agregar y personalizar todos los bloques.' },
@@ -148,6 +149,24 @@ function VistaPreviaPlantilla({ id }: { id: TemplateId }) {
             <span style={{ color: '#8a5c34', fontSize: 10, fontWeight: 900 }}>{price}</span>
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (id === 'menu-galeria') {
+    return (
+      <div style={{ ...shell, background: '#efeee9', padding: 10 }}>
+        <div style={{ height: 62, borderRadius: 10, background: 'linear-gradient(135deg,#292929,#555)', padding: 10, color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          <div style={{ fontSize: 7, letterSpacing: 2, opacity: .7 }}>MENÚ</div>
+          <div style={{ fontSize: 17, lineHeight: 1, fontWeight: 900 }}>TU MARCA</div>
+        </div>
+        <div style={{ display: 'flex', gap: 5, margin: '8px 0' }}>
+          {['Favoritos', 'Platos', 'Bebidas'].map((x, i) => <span key={x} style={{ background: i === 0 ? '#191919' : '#fff', color: i === 0 ? '#fff' : '#555', borderRadius: 999, padding: '4px 7px', fontSize: 7, fontWeight: 800 }}>{x}</span>)}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 6 }}>
+          <div style={{ height: 100, borderRadius: 10, background: '#c6b19b', position: 'relative', overflow: 'hidden' }}><div style={{ position: 'absolute', left: 7, right: 7, bottom: 7, height: 18, borderRadius: 6, background: 'rgba(255,255,255,.92)' }} /></div>
+          <div style={{ display: 'grid', gap: 6 }}><div style={{ borderRadius: 10, background: '#d9c9ba' }} /><div style={{ borderRadius: 10, background: '#b8aa9e' }} /></div>
+        </div>
       </div>
     );
   }
@@ -406,7 +425,7 @@ export default function Crear() {
       tipo,
       subdominio,
       dominio_base: dominioBase,
-      template_id: template === 'landing-lienzo' ? 'landing-negocio' : template === 'menu-informativo' ? 'tienda-moderno' : template,
+      template_id: template === 'landing-lienzo' ? 'landing-negocio' : template,
       config: configInicial(template)
     }).select('id').single();
 

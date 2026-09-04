@@ -178,7 +178,7 @@ export default function DisenoPanel() {
     patchConfig({ blocks: next });
   }
 
-  async function uploadImage(file: File, target: 'logo' | 'block', blockId?: string) {
+  async function uploadImage(file: File, target: 'logo' | 'block' | 'menuCover', blockId?: string) {
     if (!negocio) return;
     setSubiendo(true);
     const ext = file.name.split('.').pop() || 'jpg';
@@ -189,6 +189,8 @@ export default function DisenoPanel() {
       const url = `${data.publicUrl}?v=${Date.now()}`;
       if (target === 'logo') {
         patchConfig({ logoUrl: url });
+      } else if (target === 'menuCover') {
+        patchConfig({ portadaUrl: url });
       } else if (blockId) {
         const block = blocks.find((b) => b.id === blockId);
         if (block?.type === 'gallery') {
@@ -384,5 +386,16 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 function StoreEditor({ negocio, config, setConfig, guardar, guardando, uploadImage, subiendo }: any) {
   const esMenu = negocio.tipo === 'menu';
-  return <div><div className="panel-page-head"><div><div className="panel-eyebrow">Personalización</div><h1>{esMenu ? 'Diseño de tu menú' : 'Diseño de tu tienda'}</h1><p>Edita la identidad y datos principales de {negocio.nombre}.</p></div><button className="panel-button" onClick={guardar} disabled={guardando}>{guardando ? 'Guardando...' : 'Guardar cambios'}</button></div><div className="panel-card" style={{ maxWidth: 720, padding: 24 }}><Field label="Nombre visible"><input className="panel-input" value={config.titulo || ''} onChange={(e) => setConfig({ ...config, titulo: e.target.value })}/></Field><Field label="Descripción"><textarea className="panel-textarea" value={config.descripcion || ''} onChange={(e) => setConfig({ ...config, descripcion: e.target.value })}/></Field><Field label="Color principal"><input type="color" value={config.colorPrimario || '#111111'} onChange={(e) => setConfig({ ...config, colorPrimario: e.target.value })} style={{ width: 70, height: 42 }}/></Field><Field label={esMenu ? 'WhatsApp de contacto (opcional)' : 'WhatsApp'}><input className="panel-input" value={config.whatsapp || ''} onChange={(e) => setConfig({ ...config, whatsapp: e.target.value.replace(/[^0-9]/g, '') })}/></Field><Field label="Logo"><label style={{ display: 'inline-flex' }} className="panel-button secondary"><input style={{ display: 'none' }} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], 'logo')}/>{subiendo ? 'Subiendo...' : 'Subir logo'}</label></Field></div></div>;
+  const esGaleria = esMenu && negocio.template_id === 'menu-galeria';
+  return <div>
+    <div className="panel-page-head"><div><div className="panel-eyebrow">Personalización</div><h1>{esMenu ? 'Diseño de tu menú' : 'Diseño de tu tienda'}</h1><p>Edita la identidad y datos principales de {negocio.nombre}.</p></div><button className="panel-button" onClick={guardar} disabled={guardando}>{guardando ? 'Guardando...' : 'Guardar cambios'}</button></div>
+    <div className="panel-card" style={{ maxWidth: 720, padding: 24 }}>
+      <Field label="Nombre visible"><input className="panel-input" value={config.titulo || ''} onChange={(e) => setConfig({ ...config, titulo: e.target.value })}/></Field>
+      <Field label="Descripción"><textarea className="panel-textarea" value={config.descripcion || ''} onChange={(e) => setConfig({ ...config, descripcion: e.target.value })}/></Field>
+      <Field label="Color principal"><input type="color" value={config.colorPrimario || '#111111'} onChange={(e) => setConfig({ ...config, colorPrimario: e.target.value })} style={{ width: 70, height: 42 }}/></Field>
+      <Field label={esMenu ? 'WhatsApp de contacto (opcional)' : 'WhatsApp'}><input className="panel-input" value={config.whatsapp || ''} onChange={(e) => setConfig({ ...config, whatsapp: e.target.value.replace(/[^0-9]/g, '') })}/></Field>
+      <Field label="Logo"><div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>{config.logoUrl && <img src={config.logoUrl} alt="Logo actual" style={{ width: 58, height: 58, objectFit: 'cover', borderRadius: 12 }}/>}<label style={{ display: 'inline-flex' }} className="panel-button secondary"><input style={{ display: 'none' }} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], 'logo')}/>{subiendo ? 'Subiendo...' : config.logoUrl ? 'Cambiar logo' : 'Subir logo'}</label>{config.logoUrl && <button type="button" className="panel-button secondary" onClick={() => setConfig({ ...config, logoUrl: '' })}>Quitar</button>}</div></Field>
+      {esMenu && <Field label="Portada del menú"><div><p style={{ margin: '0 0 9px', fontSize: 10, color: '#858892' }}>{esGaleria ? 'En la plantilla Galería aparece grande detrás del nombre del negocio.' : 'Se guardará para que puedas usarla al cambiar a la plantilla Galería.'}</p>{config.portadaUrl && <img src={config.portadaUrl} alt="Portada actual" style={{ width: '100%', maxWidth: 430, height: 160, display: 'block', objectFit: 'cover', borderRadius: 12, marginBottom: 10 }}/>}<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><label style={{ display: 'inline-flex' }} className="panel-button secondary"><input style={{ display: 'none' }} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], 'menuCover')}/>{subiendo ? 'Subiendo...' : config.portadaUrl ? 'Cambiar portada' : 'Subir portada'}</label>{config.portadaUrl && <button type="button" className="panel-button secondary" onClick={() => setConfig({ ...config, portadaUrl: '' })}>Quitar portada</button>}</div></div></Field>}
+    </div>
+  </div>;
 }
