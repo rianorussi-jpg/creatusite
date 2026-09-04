@@ -356,6 +356,10 @@ export default function Crear() {
       };
     }
 
+    if (tpl === 'menu-informativo' || tpl === 'menu-galeria') {
+      return { ...base, menuTemplate: tpl === 'menu-galeria' ? 'galeria' : 'informativo' };
+    }
+
     return base;
   }
 
@@ -425,7 +429,7 @@ export default function Crear() {
       tipo,
       subdominio,
       dominio_base: dominioBase,
-      template_id: template === 'landing-lienzo' ? 'landing-negocio' : template,
+      template_id: template === 'landing-lienzo' ? 'landing-negocio' : tipo === 'menu' ? 'tienda-moderno' : template,
       config: configInicial(template)
     }).select('id').single();
 

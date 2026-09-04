@@ -61,7 +61,7 @@ export default async function PaginaNegocio({
     .order('orden', { ascending: true });
 
   if (business.tipo === 'menu') {
-    const MenuTemplate = business.template_id === 'menu-galeria' ? MenuGaleria : MenuInformativo;
+    const MenuTemplate = business.config?.menuTemplate === 'galeria' ? MenuGaleria : MenuInformativo;
     return <MenuTemplate business={business} products={products || []} />;
   }
 

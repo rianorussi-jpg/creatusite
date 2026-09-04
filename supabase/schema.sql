@@ -100,3 +100,8 @@ create policy "Usuarios autenticados actualizan sus archivos"
   on storage.objects for update
   to authenticated
   using (bucket_id = 'creatusitio-assets');
+
+
+-- Los sitios tipo menu reutilizan un template_id permitido por este CHECK (tienda-moderno)
+-- y guardan la variante visual en businesses.config.menuTemplate ('informativo' o 'galeria').
+-- Así no es necesario modificar businesses_template_id_check para usar las plantillas de menú.

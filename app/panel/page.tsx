@@ -55,7 +55,7 @@ export default function ResumenPanel() {
         </div>
         <div className="panel-card stat-card">
           <span>Plantilla activa</span>
-          <strong>{negocio.tipo === 'menu' ? 'Carta visual' : negocio.tipo === 'landing' && negocio.config?.builderPreset === 'lienzo' ? 'Lienzo' : TEMPLATE_LABELS[negocio.template_id] || negocio.template_id || 'Sin elegir'}</strong>
+          <strong>{negocio.tipo === 'menu' ? (negocio.config?.menuTemplate === 'galeria' ? 'Galería' : 'Carta visual') : negocio.tipo === 'landing' && negocio.config?.builderPreset === 'lienzo' ? 'Lienzo' : TEMPLATE_LABELS[negocio.template_id] || negocio.template_id || 'Sin elegir'}</strong>
           <small>{negocio.tipo === 'menu' ? 'Diseño optimizado para carta digital' : 'Puedes cambiarla sin perder contenido'}</small>
         </div>
         <div className="panel-card stat-card">

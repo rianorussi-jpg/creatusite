@@ -31,12 +31,19 @@ export default function PlantillaPanel() {
 
   async function elegir(id: string) {
     if (!negocio) return;
-    await supabase.from('businesses').update({ template_id: id }).eq('id', negocio.id);
-    setNegocio({ ...negocio, template_id: id });
+    if (negocio.tipo === 'menu') {
+      const menuTemplate = id === 'menu-galeria' ? 'galeria' : 'informativo';
+      const siguienteConfig = { ...(negocio.config || {}), menuTemplate };
+      const { error } = await supabase.from('businesses').update({ config: siguienteConfig }).eq('id', negocio.id);
+      if (!error) setNegocio({ ...negocio, config: siguienteConfig });
+      return;
+    }
+    const { error } = await supabase.from('businesses').update({ template_id: id }).eq('id', negocio.id);
+    if (!error) setNegocio({ ...negocio, template_id: id });
   }
 
   if (cargando || !negocio) return <p>Cargando...</p>;
-  const currentId = negocio.tipo === 'menu' && !['menu-informativo','menu-galeria'].includes(negocio.template_id) ? 'menu-informativo' : negocio.template_id;
+  const currentId = negocio.tipo === 'menu' ? (negocio.config?.menuTemplate === 'galeria' ? 'menu-galeria' : 'menu-informativo') : negocio.template_id;
 
   return (
     <div>

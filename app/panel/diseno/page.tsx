@@ -386,7 +386,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 function StoreEditor({ negocio, config, setConfig, guardar, guardando, uploadImage, subiendo }: any) {
   const esMenu = negocio.tipo === 'menu';
-  const esGaleria = esMenu && negocio.template_id === 'menu-galeria';
+  const esGaleria = esMenu && config.menuTemplate === 'galeria';
   return <div>
     <div className="panel-page-head"><div><div className="panel-eyebrow">Personalización</div><h1>{esMenu ? 'Diseño de tu menú' : 'Diseño de tu tienda'}</h1><p>Edita la identidad y datos principales de {negocio.nombre}.</p></div><button className="panel-button" onClick={guardar} disabled={guardando}>{guardando ? 'Guardando...' : 'Guardar cambios'}</button></div>
     <div className="panel-card" style={{ maxWidth: 720, padding: 24 }}>
