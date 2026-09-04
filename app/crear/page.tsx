@@ -472,160 +472,249 @@ export default function Crear() {
     router.push('/panel');
   }
 
+  const templateElegida = tipo && template
+    ? TEMPLATES_POR_TIPO[tipo].find((item) => item.id === template)
+    : null;
+
+  const volverPaso = () => {
+    if (paso === 1) router.push('/');
+    else if (paso === 2) {
+      setTemplate(null);
+      setPaso(1);
+    } else {
+      setPaso(2);
+    }
+  };
+
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2.5rem 1.25rem' }}>
+    <main className="crear-page">
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js"
         strategy="afterInteractive"
         onLoad={() => setTurnstileListo(true)}
       />
-      <div className="card" style={{ width: '100%', maxWidth: paso === 2 ? 760 : 460, padding: '2.5rem 2rem', transition: 'max-width .2s ease' }}>
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 17 }}>
-            creatusitio<span style={{ color: 'var(--color-accent)' }}>.mx</span>
-          </span>
-        </div>
 
-        <PasoIndicador paso={paso} />
+      <header className="crear-topbar">
+        <button onClick={() => router.push('/')} className="crear-home-btn" type="button">
+          <span className="crear-home-arrow">←</span>
+          <span>Volver al inicio</span>
+        </button>
+        <button onClick={() => router.push('/')} className="crear-brand" type="button" aria-label="Ir al inicio">
+          creatusitio<span>.mx</span>
+        </button>
+        <div className="crear-top-help">Tu sitio puede estar listo en minutos</div>
+      </header>
 
-        {paso === 1 && (
+      <div className="crear-shell">
+        <aside className="crear-sidebar">
           <div>
-            <h2 style={{ fontSize: 20, marginBottom: 4 }}>¿Qué quieres crear?</h2>
-            <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Elige lo que mejor describe tu negocio</p>
-            {(['tienda', 'menu', 'landing'] as Tipo[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  setTipo(t);
-                  setPaso(2);
-                }}
-                style={optionBtn}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--color-accent)')}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
-              >
-                <span style={{ fontWeight: 600, fontSize: 15 }}>{TIPO_LABEL[t].titulo}</span>
-                <br />
-                <span style={{ fontSize: 13, color: 'var(--color-ink-soft)' }}>{TIPO_LABEL[t].sub}</span>
-              </button>
-            ))}
+            <div className="crear-sidebar-kicker">CREA TU SITIO</div>
+            <h1>Tu página,<br /><span>paso a paso.</span></h1>
+            <p>Elige el tipo de sitio, encuentra una plantilla que te guste y publica con tu propia dirección.</p>
           </div>
-        )}
 
-        {paso === 2 && tipo && (
-          <div>
-            <h2 style={{ fontSize: 20, marginBottom: 4 }}>Elige tu plantilla</h2>
-            <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Podrás personalizarla después desde tu panel</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 14 }}>
-              {TEMPLATES_POR_TIPO[tipo].map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => {
-                    setTemplate(t.id);
-                    setPaso(3);
-                  }}
-                  style={templateBtn}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-accent)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-border)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <VistaPreviaPlantilla id={t.id} />
-                  <div style={{ paddingTop: 14 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 5 }}>
-                      <span style={{ fontWeight: 700, fontSize: 16 }}>{t.nombre}</span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-accent)' }}>Elegir →</span>
-                    </div>
-                    <span style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--color-ink-soft)' }}>{t.descripcion}</span>
+          <div className="crear-sidebar-steps">
+            {[
+              ['01', 'Tipo de sitio', 'Qué quieres crear'],
+              ['02', 'Diseño', 'Elige una plantilla'],
+              ['03', 'Publicar', 'Completa tus datos']
+            ].map(([num, title, desc], index) => {
+              const stepNum = index + 1;
+              const current = paso === stepNum;
+              const done = paso > stepNum;
+              return (
+                <div className={`crear-side-step ${current ? 'is-current' : ''} ${done ? 'is-done' : ''}`} key={num}>
+                  <div className="crear-side-step-number">{done ? '✓' : num}</div>
+                  <div>
+                    <strong>{title}</strong>
+                    <span>{desc}</span>
                   </div>
-                </button>
-              ))}
-            </div>
-            <button onClick={() => setPaso(1)} style={backBtn}>← Atrás</button>
-          </div>
-        )}
-
-        {paso === 3 && (
-          <div>
-            <h2 style={{ fontSize: 20, marginBottom: 4 }}>Datos de tu negocio</h2>
-            <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Último paso antes de publicar</p>
-
-            <input placeholder="Nombre del negocio" value={nombre} onChange={(e) => setNombre(e.target.value)} style={inputStyle} />
-
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', marginBottom: 7, color: 'var(--color-ink)', fontSize: 12, fontWeight: 700 }}>
-                Elige la dirección de tu página
-              </label>
-              <div style={{ display: 'flex', alignItems: 'stretch', border: '1.5px solid var(--color-border)', borderRadius: 10, overflow: 'hidden', background: '#fff' }}>
-                <input
-                  placeholder="tunegocio"
-                  value={subdominio}
-                  onChange={(e) => setSubdominio(normalizarSubdominio(e.target.value))}
-                  style={{ ...inputStyle, flex: 1, minWidth: 0, border: 'none', marginBottom: 0, borderRadius: 0 }}
-                />
-                <div style={{ display: 'flex', alignItems: 'center', borderLeft: '1px solid var(--color-border)', background: '#faf9f6' }}>
-                  <span style={{ paddingLeft: 10, color: 'var(--color-ink-soft)', fontSize: 13, fontFamily: 'var(--font-mono)' }}>.</span>
-                  <select
-                    value={dominioBase}
-                    onChange={(e) => setDominioBase(e.target.value as DominioBase)}
-                    aria-label="Dominio base"
-                    style={{
-                      height: '100%',
-                      minHeight: 48,
-                      padding: '0 12px 0 4px',
-                      border: 0,
-                      background: 'transparent',
-                      color: 'var(--color-ink)',
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 13,
-                      fontWeight: 700,
-                      outline: 'none',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <option value="creatusitio.mx">creatusitio.mx</option>
-                    <option value="enla.mx">enla.mx</option>
-                  </select>
                 </div>
+              );
+            })}
+          </div>
+
+          <div className="crear-selection-summary">
+            <div className="crear-summary-label">TU ELECCIÓN</div>
+            <div className="crear-summary-row">
+              <span>Tipo</span>
+              <strong>{tipo ? TIPO_LABEL[tipo].titulo : 'Por elegir'}</strong>
+            </div>
+            <div className="crear-summary-row">
+              <span>Plantilla</span>
+              <strong>{templateElegida?.nombre || 'Por elegir'}</strong>
+            </div>
+            {paso === 3 && (
+              <div className="crear-summary-domain">
+                <span>Tu dirección</span>
+                <strong>{subdominio || 'tunegocio'}.{dominioBase}</strong>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 7, color: 'var(--color-ink-soft)', fontSize: 10 }}>
-                <span>Tu página quedará publicada en:</span>
-                <strong style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                  {subdominio || 'tunegocio'}.{dominioBase}
-                </strong>
+            )}
+          </div>
+        </aside>
+
+        <section className={`crear-main-card ${paso === 2 ? 'crear-main-card-wide' : ''}`}>
+          <div className="crear-mobile-head">
+            <div className="crear-mobile-brand">creatusitio<span>.mx</span></div>
+            <button onClick={() => router.push('/')} type="button">← Inicio</button>
+          </div>
+
+          <div className="crear-mobile-progress">
+            <div className="crear-mobile-progress-top"><span>Paso {paso} de 3</span><strong>{paso === 1 ? 'Tipo de sitio' : paso === 2 ? 'Elige diseño' : 'Publica tu sitio'}</strong></div>
+            <div className="crear-mobile-progress-track"><span style={{ width: `${(paso / 3) * 100}%` }} /></div>
+          </div>
+
+          {paso === 1 && (
+            <div className="crear-content">
+              <div className="crear-heading">
+                <span className="crear-eyebrow">EMPECEMOS</span>
+                <h2>¿Qué quieres crear?</h2>
+                <p>Escoge el formato que mejor se adapta a lo que necesitas. Después podrás personalizarlo desde tu panel.</p>
+              </div>
+
+              <div className="crear-type-grid">
+                {([
+                  ['tienda', '▣', 'Vende en línea', 'Catálogo, carrito y pedidos por WhatsApp', ['Productos', 'Carrito', 'Pedidos']],
+                  ['menu', '◫', 'Muestra tu menú', 'Una carta visual con fotos, categorías y precios', ['Categorías', 'Fotos', 'Sin carrito']],
+                  ['landing', '✦', 'Presenta tu negocio', 'Servicios, información, contacto y llamadas a la acción', ['Secciones', 'Servicios', 'Contacto']]
+                ] as [Tipo, string, string, string, string[]][]).map(([t, icon, title, desc, features]) => (
+                  <button
+                    key={t}
+                    onClick={() => { setTipo(t); setTemplate(null); setPaso(2); }}
+                    className="crear-type-card"
+                    type="button"
+                  >
+                    <div className="crear-type-top">
+                      <span className="crear-type-icon">{icon}</span>
+                      <span className="crear-type-arrow">→</span>
+                    </div>
+                    <div className="crear-type-copy">
+                      <span className="crear-type-label">{TIPO_LABEL[t].titulo}</span>
+                      <h3>{title}</h3>
+                      <p>{desc}</p>
+                    </div>
+                    <div className="crear-feature-list">
+                      {features.map((feature) => <span key={feature}>✓ {feature}</span>)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="crear-bottom-note">
+                <span>✓</span>
+                <div><strong>No necesitas saber programar.</strong><br />Todo lo podrás administrar y editar desde tu panel.</div>
               </div>
             </div>
+          )}
 
-            <input
-              placeholder={tipo === 'menu' ? 'WhatsApp de contacto (opcional)' : 'WhatsApp donde recibirás pedidos (ej. 524421234567)'}
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))}
-              style={inputStyle}
-            />
-            {!revisandoSesion && usuarioSesion ? (
-              <div style={{ marginBottom: 16, padding: '12px 14px', borderRadius: 10, background: '#eef8f3', color: '#177455', fontSize: 12, lineHeight: 1.5 }}>
-                <strong>Se agregará a tu cuenta actual.</strong><br />No necesitas volver a escribir correo ni contraseña.
+          {paso === 2 && tipo && (
+            <div className="crear-content">
+              <div className="crear-heading crear-heading-row">
+                <div>
+                  <span className="crear-eyebrow">{TIPO_LABEL[tipo].titulo.toUpperCase()}</span>
+                  <h2>Elige el estilo de tu sitio</h2>
+                  <p>Esta es la base visual. Contenido, colores, imágenes y textos se pueden cambiar después.</p>
+                </div>
+                <button onClick={volverPaso} className="crear-inline-back" type="button">← Cambiar tipo</button>
               </div>
-            ) : !revisandoSesion ? (
-              <>
-                <input placeholder="Tu correo" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-                <input placeholder="Contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
-              </>
-            ) : null}
 
-            {error && <p style={{ color: 'var(--color-accent)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
+              <div className="crear-template-grid">
+                {TEMPLATES_POR_TIPO[tipo].map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => { setTemplate(t.id); setPaso(3); }}
+                    className="crear-template-card"
+                    type="button"
+                  >
+                    <div className="crear-template-preview"><VistaPreviaPlantilla id={t.id} /></div>
+                    <div className="crear-template-info">
+                      <div className="crear-template-title-row">
+                        <div><span>PLANTILLA</span><h3>{t.nombre}</h3></div>
+                        <span className="crear-template-choose">Elegir →</span>
+                      </div>
+                      <p>{t.descripcion}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
 
-            <div ref={turnstileRef} style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }} />
+              <div className="crear-step-footer">
+                <button onClick={volverPaso} className="crear-secondary-btn" type="button">← Regresar</button>
+                <span>Selecciona una plantilla para continuar</span>
+              </div>
+            </div>
+          )}
 
-            <button onClick={crearNegocio} disabled={cargando || !turnstileToken} className="btn btn-accent btn-full">
-              {cargando ? 'Creando...' : 'Crear mi página →'}
-            </button>
-            <button onClick={() => setPaso(2)} style={backBtn}>← Atrás</button>
-          </div>
-        )}
+          {paso === 3 && (
+            <div className="crear-content crear-form-content">
+              <div className="crear-heading crear-heading-row">
+                <div>
+                  <span className="crear-eyebrow">ÚLTIMO PASO</span>
+                  <h2>Publica tu nueva página</h2>
+                  <p>Completa estos datos básicos. Podrás agregar todo el contenido desde tu panel después de crearla.</p>
+                </div>
+                <button onClick={volverPaso} className="crear-inline-back" type="button">← Cambiar plantilla</button>
+              </div>
+
+              <div className="crear-form-layout">
+                <div className="crear-form-panel">
+                  <div className="crear-form-section-title"><span>1</span><div><strong>Tu negocio</strong><small>Información principal</small></div></div>
+
+                  <label className="crear-field-label">Nombre del negocio</label>
+                  <input placeholder="Ej. Café Central" value={nombre} onChange={(e) => setNombre(e.target.value)} className="crear-input" />
+
+                  <label className="crear-field-label">Dirección de tu página</label>
+                  <div className="crear-domain-input">
+                    <input placeholder="tunegocio" value={subdominio} onChange={(e) => setSubdominio(normalizarSubdominio(e.target.value))} />
+                    <div className="crear-domain-select"><span>.</span><select value={dominioBase} onChange={(e) => setDominioBase(e.target.value as DominioBase)} aria-label="Dominio base"><option value="creatusitio.mx">creatusitio.mx</option><option value="enla.mx">enla.mx</option></select></div>
+                  </div>
+                  <div className="crear-domain-preview"><span>Se publicará en</span><strong>{subdominio || 'tunegocio'}.{dominioBase}</strong></div>
+
+                  <label className="crear-field-label">WhatsApp {tipo === 'menu' ? <small>(opcional)</small> : null}</label>
+                  <input placeholder={tipo === 'menu' ? 'Ej. 524421234567' : 'WhatsApp donde recibirás pedidos'} value={whatsapp} onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))} className="crear-input" />
+
+                  <div className="crear-divider" />
+                  <div className="crear-form-section-title"><span>2</span><div><strong>Tu cuenta</strong><small>Para administrar el sitio</small></div></div>
+
+                  {!revisandoSesion && usuarioSesion ? (
+                    <div className="crear-session-box"><span>✓</span><div><strong>Se agregará a tu cuenta actual</strong><p>No necesitas volver a escribir correo ni contraseña.</p></div></div>
+                  ) : !revisandoSesion ? (
+                    <>
+                      <label className="crear-field-label">Correo electrónico</label>
+                      <input placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} className="crear-input" />
+                      <label className="crear-field-label">Contraseña</label>
+                      <input placeholder="Crea una contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="crear-input" />
+                    </>
+                  ) : null}
+                </div>
+
+                <aside className="crear-publish-panel">
+                  <div className="crear-publish-badge">LISTO PARA PUBLICAR</div>
+                  <h3>{nombre || 'Tu nuevo sitio'}</h3>
+                  <div className="crear-publish-meta"><span>{tipo ? TIPO_LABEL[tipo].titulo : 'Sitio'}</span><span>•</span><span>{templateElegida?.nombre || 'Plantilla'}</span></div>
+                  <div className="crear-publish-url">{subdominio || 'tunegocio'}.<strong>{dominioBase}</strong></div>
+                  <div className="crear-publish-list">
+                    <div><span>✓</span> Panel para editar tu contenido</div>
+                    <div><span>✓</span> Diseño adaptable a celular</div>
+                    <div><span>✓</span> Publicación con tu subdominio</div>
+                  </div>
+
+                  {error && <div className="crear-error">{error}</div>}
+                  <div ref={turnstileRef} className="crear-turnstile" />
+                  <button onClick={crearNegocio} disabled={cargando || !turnstileToken} className="crear-publish-btn" type="button">
+                    {cargando ? 'Creando tu página...' : 'Crear y abrir mi panel →'}
+                  </button>
+                  <p className="crear-security-note">La verificación de seguridad es necesaria antes de publicar.</p>
+                </aside>
+              </div>
+
+              <div className="crear-step-footer">
+                <button onClick={volverPaso} className="crear-secondary-btn" type="button">← Regresar</button>
+                <span>Podrás cambiar estos datos después</span>
+              </div>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
