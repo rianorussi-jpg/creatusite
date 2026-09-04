@@ -13,14 +13,17 @@ declare global {
   }
 }
 
-type Tipo = 'tienda' | 'landing';
+type Tipo = 'tienda' | 'landing' | 'menu';
 type DominioBase = 'creatusitio.mx' | 'enla.mx';
-type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'landing-lienzo' | 'tienda-moderno' | 'tienda-directo';
+type TemplateId = 'landing-negocio' | 'landing-profesionista' | 'landing-lienzo' | 'tienda-moderno' | 'tienda-directo' | 'menu-informativo';
 
 const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descripcion: string }[]> = {
   tienda: [
     { id: 'tienda-moderno', nombre: 'Minimalista', descripcion: 'Diseño limpio en tonos verdes con un flujo guiado para comprar paso a paso.' },
     { id: 'tienda-directo', nombre: 'Colores', descripcion: 'Diseño llamativo en rojo y amarillo, con categorías visibles y compra más directa.' }
+  ],
+  menu: [
+    { id: 'menu-informativo', nombre: 'Carta visual', descripcion: 'Menú informativo con categorías, fotos, descripciones y precios. Sin carrito ni pedidos.' }
   ],
   landing: [
     { id: 'landing-negocio', nombre: 'Impulso', descripcion: 'Moderna, dinámica y enfocada en convertir. Después podrás mover, agregar y personalizar todos los bloques.' },
@@ -31,7 +34,8 @@ const TEMPLATES_POR_TIPO: Record<Tipo, { id: TemplateId; nombre: string; descrip
 
 const TIPO_LABEL: Record<Tipo, { titulo: string; sub: string }> = {
   tienda: { titulo: 'Tienda', sub: 'Vende productos con carrito y pedido por WhatsApp' },
-  landing: { titulo: 'Landing page', sub: 'Presenta tu negocio, servicios y contacto en una sola página' }
+  landing: { titulo: 'Landing page', sub: 'Presenta tu negocio, servicios y contacto en una sola página' },
+  menu: { titulo: 'Menú', sub: 'Publica tu carta con categorías, fotos, descripciones y precios, sin carrito' }
 };
 
 function PasoIndicador({ paso }: { paso: number }) {
@@ -123,6 +127,27 @@ function VistaPreviaPlantilla({ id }: { id: TemplateId }) {
             </div>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (id === 'menu-informativo') {
+    return (
+      <div style={{ ...shell, background: '#fbf7f0', padding: 12 }}>
+        <div style={{ textAlign: 'center', padding: '8px 6px 10px' }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: '#2e261f' }}>TU MENÚ</div>
+          <div style={{ width: '48%', height: 5, borderRadius: 999, background: '#d7cdc0', margin: '6px auto 0' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 9, overflow: 'hidden' }}>
+          {['Entradas', 'Platos', 'Bebidas'].map((x, i) => <span key={x} style={{ background: i === 0 ? '#2e261f' : '#fff', color: i === 0 ? '#fff' : '#6d6258', border: '1px solid #e5dccf', borderRadius: 999, padding: '5px 9px', fontSize: 8, fontWeight: 800, whiteSpace: 'nowrap' }}>{x}</span>)}
+        </div>
+        {[['Pasta de la casa', '$180'], ['Ensalada especial', '$135']].map(([name, price], i) => (
+          <div key={name} style={{ background: '#fff', border: '1px solid #e5dccf', borderRadius: 11, padding: 8, display: 'flex', gap: 8, alignItems: 'center', marginBottom: 7 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 9, background: i ? '#eadfce' : '#d7c3aa' }} />
+            <div style={{ flex: 1 }}><div style={{ fontSize: 9, fontWeight: 900, color: '#2e261f' }}>{name}</div><div style={{ ...line('65%', '#e6ded3'), marginTop: 5 }} /></div>
+            <span style={{ color: '#8a5c34', fontSize: 10, fontWeight: 900 }}>{price}</span>
+          </div>
+        ))}
       </div>
     );
   }
@@ -317,7 +342,7 @@ export default function Crear() {
 
   async function crearNegocio() {
     setError('');
-    if (!tipo || !template || !nombre || !subdominio || !whatsapp) {
+    if (!tipo || !template || !nombre || !subdominio || (tipo !== 'menu' && !whatsapp)) {
       setError('Falta completar algún campo.');
       return;
     }
@@ -381,7 +406,7 @@ export default function Crear() {
       tipo,
       subdominio,
       dominio_base: dominioBase,
-      template_id: template === 'landing-lienzo' ? 'landing-negocio' : template,
+      template_id: template === 'landing-lienzo' ? 'landing-negocio' : template === 'menu-informativo' ? 'tienda-moderno' : template,
       config: configInicial(template)
     }).select('id').single();
 
@@ -444,7 +469,7 @@ export default function Crear() {
           <div>
             <h2 style={{ fontSize: 20, marginBottom: 4 }}>¿Qué quieres crear?</h2>
             <p style={{ fontSize: 13, color: 'var(--color-ink-soft)', marginBottom: 20 }}>Elige lo que mejor describe tu negocio</p>
-            {(['tienda', 'landing'] as Tipo[]).map((t) => (
+            {(['tienda', 'menu', 'landing'] as Tipo[]).map((t) => (
               <button
                 key={t}
                 onClick={() => {
@@ -552,7 +577,7 @@ export default function Crear() {
             </div>
 
             <input
-              placeholder="WhatsApp donde recibirás pedidos (ej. 524421234567)"
+              placeholder={tipo === 'menu' ? 'WhatsApp de contacto (opcional)' : 'WhatsApp donde recibirás pedidos (ej. 524421234567)'}
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))}
               style={inputStyle}

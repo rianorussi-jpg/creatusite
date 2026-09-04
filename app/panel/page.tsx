@@ -55,8 +55,8 @@ export default function ResumenPanel() {
         </div>
         <div className="panel-card stat-card">
           <span>Plantilla activa</span>
-          <strong>{negocio.tipo === 'landing' && negocio.config?.builderPreset === 'lienzo' ? 'Lienzo' : TEMPLATE_LABELS[negocio.template_id] || negocio.template_id || 'Sin elegir'}</strong>
-          <small>Puedes cambiarla sin perder contenido</small>
+          <strong>{negocio.tipo === 'menu' ? 'Carta visual' : negocio.tipo === 'landing' && negocio.config?.builderPreset === 'lienzo' ? 'Lienzo' : TEMPLATE_LABELS[negocio.template_id] || negocio.template_id || 'Sin elegir'}</strong>
+          <small>{negocio.tipo === 'menu' ? 'Diseño optimizado para carta digital' : 'Puedes cambiarla sin perder contenido'}</small>
         </div>
         <div className="panel-card stat-card">
           <span>WhatsApp</span>
@@ -80,16 +80,25 @@ export default function ResumenPanel() {
               <b>→</b>
             </Link>
           )}
+          {negocio.tipo === 'menu' && (
+            <Link href="/panel/menu" className="quick-card panel-card">
+              <span className="quick-icon">☰</span>
+              <div><strong>Administra tu menú</strong><small>Agrega categorías, fotos, descripciones y precios.</small></div>
+              <b>→</b>
+            </Link>
+          )}
           <Link href="/panel/diseno" className="quick-card panel-card">
             <span className="quick-icon">✦</span>
             <div><strong>Personaliza el diseño</strong><small>Edita colores, logo y contenido.</small></div>
             <b>→</b>
           </Link>
-          <Link href="/panel/plantillas" className="quick-card panel-card">
-            <span className="quick-icon">▦</span>
-            <div><strong>Cambia la plantilla</strong><small>Prueba otra presentación sin perder datos.</small></div>
-            <b>→</b>
-          </Link>
+          {negocio.tipo !== 'menu' && (
+            <Link href="/panel/plantillas" className="quick-card panel-card">
+              <span className="quick-icon">▦</span>
+              <div><strong>Cambia la plantilla</strong><small>Prueba otra presentación sin perder datos.</small></div>
+              <b>→</b>
+            </Link>
+          )}
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import LandingNegocio from '@/components/templates/LandingNegocio';
 import LandingProfesionista from '@/components/templates/LandingProfesionista';
 import TiendaModerno from '@/components/templates/TiendaModerno';
 import TiendaDirecto from '@/components/templates/TiendaDirecto';
+import MenuInformativo from '@/components/templates/MenuInformativo';
 
 const TEMPLATES: Record<string, any> = {
   'landing-negocio': LandingNegocio,
@@ -58,7 +59,8 @@ export default async function PaginaNegocio({
     .eq('disponible', true)
     .order('orden', { ascending: true });
 
-  const Template = TEMPLATES[business.template_id] || LandingNegocio;
+  if (business.tipo === 'menu') return <MenuInformativo business={business} products={products || []} />;
 
+  const Template = TEMPLATES[business.template_id] || LandingNegocio;
   return <Template business={business} products={products || []} />;
 }

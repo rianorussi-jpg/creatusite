@@ -9,6 +9,7 @@ import { useMiNegocio } from '@/lib/useMiNegocio';
 const ITEMS = [
   { href: '/panel', label: 'Resumen', icon: '⌂', exact: true },
   { href: '/panel/productos', label: 'Productos', icon: '□' },
+  { href: '/panel/menu', label: 'Menú', icon: '☰' },
   { href: '/panel/diseno', label: 'Diseño', icon: '✦' },
   { href: '/panel/plantillas', label: 'Plantillas', icon: '▦' }
 ];
@@ -71,7 +72,12 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
 
         <div className="panel-nav-label">Tu negocio</div>
         <nav className="panel-nav">
-          {ITEMS.filter((item) => item.href !== '/panel/productos' || negocio?.tipo === 'tienda').map((item) => {
+          {ITEMS.filter((item) => {
+            if (item.href === '/panel/productos') return negocio?.tipo === 'tienda';
+            if (item.href === '/panel/menu') return negocio?.tipo === 'menu';
+            if (item.href === '/panel/plantillas') return negocio?.tipo !== 'menu';
+            return true;
+          }).map((item) => {
             const activo = item.exact ? pathname === item.href : pathname.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} className={`panel-nav-item ${activo ? 'active' : ''}`}>

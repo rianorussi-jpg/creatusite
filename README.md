@@ -77,3 +77,6 @@ Esto habilita:
 - Confirmación por correo al registrarse (Supabase Auth ya lo soporta, falta configurar el template de correo)
 - Reordenar productos y categorías (arrastrar y soltar)
 - Panel de pedidos en tiempo real, reutilizando el patrón ya construido en panel.creatusitio.mx
+
+## Tipo de sitio: Menú informativo
+El flujo `/crear` permite crear un sitio de tipo `menu`. Este tipo reutiliza la tabla `products` como elementos de carta y `businesses.categories` como secciones. Se administra desde `/panel/menu` y se renderiza sin carrito, cantidades, entrega ni pedidos.
