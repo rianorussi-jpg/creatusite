@@ -39,6 +39,58 @@ const TIPO_LABEL: Record<Tipo, { titulo: string; sub: string }> = {
   menu: { titulo: 'Menú', sub: 'Publica tu carta con categorías, fotos, descripciones y precios, sin carrito' }
 };
 
+
+function TipoIcon({ tipo }: { tipo: Tipo }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true
+  };
+
+  if (tipo === 'tienda') {
+    return (
+      <svg {...common}>
+        <path d="M3.5 9.25h17" />
+        <path d="M5 9.25V20h14V9.25" />
+        <path d="M4.2 9.25 5.7 4h12.6l1.5 5.25" />
+        <path d="M8 20v-5.5h4V20" />
+        <path d="M5.1 9.25c0 1.35 1 2.25 2.2 2.25s2.2-.9 2.2-2.25c0 1.35 1 2.25 2.5 2.25s2.5-.9 2.5-2.25c0 1.35 1 2.25 2.2 2.25s2.2-.9 2.2-2.25" />
+      </svg>
+    );
+  }
+
+  if (tipo === 'menu') {
+    return (
+      <svg {...common}>
+        <path d="M6 3.75h12a1.5 1.5 0 0 1 1.5 1.5v13.5A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5V5.25A1.5 1.5 0 0 1 6 3.75Z" />
+        <path d="M8 7.5h8" />
+        <path d="M8 11h3.5" />
+        <path d="M8 14.5h3.5" />
+        <path d="M15.25 10.75v5.5" />
+        <path d="M13.75 12.5c.25-1 .75-1.75 1.5-1.75s1.25.75 1.5 1.75" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...common}>
+      <rect x="3.5" y="4" width="17" height="16" rx="2" />
+      <path d="M3.5 8h17" />
+      <circle cx="6.5" cy="6" r=".55" fill="currentColor" stroke="none" />
+      <circle cx="8.5" cy="6" r=".55" fill="currentColor" stroke="none" />
+      <path d="M7.25 12h9.5" />
+      <path d="M9.25 15.25h5.5" />
+      <path d="M10.25 18h3.5" />
+    </svg>
+  );
+}
+
 function PasoIndicador({ paso }: { paso: number }) {
   const nombres = ['Tipo', 'Plantilla', 'Datos'];
   return (
@@ -574,10 +626,10 @@ export default function Crear() {
 
               <div className="crear-type-grid">
                 {([
-                  ['tienda', '▣', 'Vende en línea', 'Catálogo, carrito y pedidos por WhatsApp', ['Productos', 'Carrito', 'Pedidos']],
-                  ['menu', '◫', 'Muestra tu menú', 'Una carta visual con fotos, categorías y precios', ['Categorías', 'Fotos', 'Sin carrito']],
-                  ['landing', '✦', 'Presenta tu negocio', 'Servicios, información, contacto y llamadas a la acción', ['Secciones', 'Servicios', 'Contacto']]
-                ] as [Tipo, string, string, string, string[]][]).map(([t, icon, title, desc, features]) => (
+                  ['tienda', 'Vende en línea', 'Catálogo, carrito y pedidos por WhatsApp', ['Productos', 'Carrito', 'Pedidos']],
+                  ['menu', 'Muestra tu menú', 'Una carta visual con fotos, categorías y precios', ['Categorías', 'Fotos', 'Sin carrito']],
+                  ['landing', 'Presenta tu negocio', 'Servicios, información, contacto y llamadas a la acción', ['Secciones', 'Servicios', 'Contacto']]
+                ] as [Tipo, string, string, string[]][]).map(([t, title, desc, features]) => (
                   <button
                     key={t}
                     onClick={() => { setTipo(t); setTemplate(null); setPaso(2); }}
@@ -585,7 +637,7 @@ export default function Crear() {
                     type="button"
                   >
                     <div className="crear-type-top">
-                      <span className="crear-type-icon">{icon}</span>
+                      <span className="crear-type-icon"><TipoIcon tipo={t} /></span>
                       <span className="crear-type-arrow">→</span>
                     </div>
                     <div className="crear-type-copy">
